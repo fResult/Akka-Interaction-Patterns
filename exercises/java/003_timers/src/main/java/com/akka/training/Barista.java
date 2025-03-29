@@ -6,38 +6,17 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
 
-    interface BaristaCommand { }
-
-    public static final class OrderCoffee implements BaristaCommand {
-        public final String whom;
-        public final Coffee coffee;
-        public OrderCoffee(String whom, Coffee coffee) { this.whom = whom; this.coffee = coffee; }
-    }
-
-    public static final class WrappedCoffeeMachineCoffeeIsReady implements BaristaCommand {
-        public final CoffeeMachine.CoffeeIsReady coffeeReady;
-        public WrappedCoffeeMachineCoffeeIsReady(CoffeeMachine.CoffeeIsReady coffeeReady) {
-            this.coffeeReady = coffeeReady;
-        }
-    }
-
     // Orders <Whom, Coffee>
     private final Map<String, Coffee> orders = new HashMap<>();
-
     // reference to the coffee-machine child actor, allowing to send messages to coffee machine
     private final ActorRef<CoffeeMachine.CoffeeMachineCommand> coffeeMachine;
     private final ActorRef<CoffeeMachine.CoffeeIsReady> coffeeMachineMessageAdapter;
-
-    public static Behavior<BaristaCommand> create() {
-        return Behaviors.setup(Barista::new);
-    }
 
     private Barista(ActorContext<BaristaCommand> context) {
         super(context);
@@ -50,6 +29,18 @@ public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
         coffeeMachineMessageAdapter = context.messageAdapter(
             CoffeeMachine.CoffeeIsReady.class, WrappedCoffeeMachineCoffeeIsReady::new
         );
+    }
+
+    public static Behavior<BaristaCommand> create() {
+        return Behaviors.setup(Barista::new);
+    }
+
+    // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
+    static String printOrders(Set<Map.Entry<String,Coffee>> orders) {
+        return orders.stream()
+            .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
+            .reduce((acc, s) -> acc + "," + s)
+            .map(s -> "[" + s + "]").orElse("[" + "]");
     }
 
     @Override
@@ -79,11 +70,18 @@ public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
         return this;
     }
 
-    // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
-    static String printOrders(Set<Map.Entry<String,Coffee>> orders) {
-        return orders.stream()
-            .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
-            .reduce((acc, s) -> acc + "," + s)
-            .map(s -> "[" + s + "]").orElse("[" + "]");
+    interface BaristaCommand { }
+
+    public static final class OrderCoffee implements BaristaCommand {
+        public final String whom;
+        public final Coffee coffee;
+        public OrderCoffee(String whom, Coffee coffee) { this.whom = whom; this.coffee = coffee; }
+    }
+
+    public static final class WrappedCoffeeMachineCoffeeIsReady implements BaristaCommand {
+        public final CoffeeMachine.CoffeeIsReady coffeeReady;
+        public WrappedCoffeeMachineCoffeeIsReady(CoffeeMachine.CoffeeIsReady coffeeReady) {
+            this.coffeeReady = coffeeReady;
+        }
     }
 }

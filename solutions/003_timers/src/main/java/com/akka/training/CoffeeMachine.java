@@ -4,40 +4,11 @@ import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
-
 import java.time.Duration;
 
 public class CoffeeMachine {
 
     private static final int BREWING_DURATION_SECONDS = 10;
-
-    // <- Protocol definition
-    public interface CoffeeMachineCommand { }
-
-    public static final class BrewCoffee implements CoffeeMachineCommand {
-        public final Coffee coffee;
-        public final ActorRef<CoffeeIsReady> replyTo;
-        public BrewCoffee(
-                Coffee coffee,
-                ActorRef<CoffeeIsReady> replyTo
-        ) { this.coffee = coffee; this.replyTo = replyTo; }
-    }
-
-    public static final class CoffeeIsReady implements CoffeeMachineCommand {
-        public final Coffee coffee;
-        public CoffeeIsReady(Coffee coffee) { this.coffee = coffee; }
-    }
-
-    /*
-    Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready
-    for the next coffee
-     */
-    public static final class PickupCoffee implements CoffeeMachineCommand { }
-    // Protocol definition ->
-
-    // Note: CoffeeReadyTick is an internal message scheduled by the actor's timer that signal that brewing is completed.
-    // We make it private as it is for internal implementation and shouldn't be exposed as external protocol.
-    private static final class CoffeeReadyTick implements CoffeeMachineCommand {}
 
     public static Behavior<CoffeeMachineCommand> create() {
         return Behaviors.setup(context -> idle(context));
@@ -68,6 +39,7 @@ public class CoffeeMachine {
             })
             .build();
     }
+    // Protocol definition ->
 
     private static Behavior<CoffeeMachineCommand> coffeeReady(final ActorContext<CoffeeMachineCommand> context) {
         context.getLog().info("CoffeeMachine: Coffee is ready");
@@ -77,4 +49,31 @@ public class CoffeeMachine {
             .onMessage(PickupCoffee.class, command -> idle(context))
             .build();
     }
+
+    // <- Protocol definition
+    public interface CoffeeMachineCommand { }
+
+    public static final class BrewCoffee implements CoffeeMachineCommand {
+        public final Coffee coffee;
+        public final ActorRef<CoffeeIsReady> replyTo;
+        public BrewCoffee(
+                Coffee coffee,
+                ActorRef<CoffeeIsReady> replyTo
+        ) { this.coffee = coffee; this.replyTo = replyTo; }
+    }
+
+    public static final class CoffeeIsReady implements CoffeeMachineCommand {
+        public final Coffee coffee;
+        public CoffeeIsReady(Coffee coffee) { this.coffee = coffee; }
+    }
+
+    /*
+    Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready
+    for the next coffee
+     */
+    public static final class PickupCoffee implements CoffeeMachineCommand { }
+
+    // Note: CoffeeReadyTick is an internal message scheduled by the actor's timer that signal that brewing is completed.
+    // We make it private as it is for internal implementation and shouldn't be exposed as external protocol.
+    private static final class CoffeeReadyTick implements CoffeeMachineCommand {}
 }

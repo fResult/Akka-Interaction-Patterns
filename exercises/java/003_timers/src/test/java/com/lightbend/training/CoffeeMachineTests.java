@@ -4,17 +4,14 @@ import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
+import java.time.Duration;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.time.Duration;
-
-
 public class CoffeeMachineTests {
 
-    private final int BREWING_DURATION_Millis = 10000;
-
     @ClassRule public static final TestKitJunitResource testKit = new TestKitJunitResource();
+    private final int BREWING_DURATION_Millis = 10000;
 
     // CoffeeMachine should transition from IDLE to Brewing on receiving BrewCoffee message
     @Test

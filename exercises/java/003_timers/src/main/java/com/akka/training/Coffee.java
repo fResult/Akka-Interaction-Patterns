@@ -4,27 +4,39 @@ import java.io.Serializable;
 
 interface Coffee extends Serializable {
 
-    final class Akkaccino implements Coffee {
-        @Override
-        public String toString() { return this.getClass().getSimpleName(); }
-
-        @Override
-        public boolean equals(Object o) { return o == this || o instanceof Akkaccino; }
+  final class Akkaccino implements Coffee {
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName();
     }
 
-    final class CaffeJava implements Coffee {
-        @Override
-        public String toString() { return this.getClass().getSimpleName(); }
+    @Override
+    public boolean equals(Object o) {
+      return o == this || o instanceof Akkaccino;
+    }
+  }
 
-        @Override
-        public boolean equals(Object o) { return o == this || o instanceof CaffeJava; }
+  final class CaffeJava implements Coffee {
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName();
     }
 
-    final class MochaPlay implements Coffee {
-        @Override
-        public String toString() { return this.getClass().getSimpleName(); }
-
-        @Override
-        public boolean equals(Object o) { return o == this || o instanceof MochaPlay; }
+    @Override
+    public boolean equals(Object o) {
+      return o == this || o instanceof CaffeJava;
     }
+  }
+
+  final class MochaPlay implements Coffee {
+    @Override
+    public String toString() {
+      return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      return o == this || o instanceof MochaPlay;
+    }
+  }
 }

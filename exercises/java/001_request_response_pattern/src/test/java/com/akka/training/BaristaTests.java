@@ -1,19 +1,18 @@
 package com.akka.training;
 
-import akka.actor.testkit.typed.CapturedLogEvent;
-import akka.actor.testkit.typed.Effect;
-import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static com.akka.training.TestsUtils.expectedInfoLog;
 import static com.akka.training.TestsUtils.lastCapturedLogEvent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import akka.actor.testkit.typed.CapturedLogEvent;
+import akka.actor.testkit.typed.Effect;
+import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
+import akka.actor.testkit.typed.javadsl.TestInbox;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.junit.Test;
 
 public class BaristaTests {
 

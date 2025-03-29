@@ -2,7 +2,6 @@ package com.akka.training;
 
 import akka.actor.testkit.typed.CapturedLogEvent;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
-
 import java.util.HashMap;
 import java.util.Optional;
 import org.slf4j.event.Level;

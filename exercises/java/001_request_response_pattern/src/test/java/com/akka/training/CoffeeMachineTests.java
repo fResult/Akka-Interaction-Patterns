@@ -1,13 +1,12 @@
 package com.akka.training;
 
-import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
 import static com.akka.training.TestsUtils.*;
-import akka.actor.testkit.typed.javadsl.TestInbox;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
+
+import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
+import akka.actor.testkit.typed.javadsl.TestInbox;
+import java.util.List;
+import org.junit.Test;
 
 public class CoffeeMachineTests {
 
