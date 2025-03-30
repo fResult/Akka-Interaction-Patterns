@@ -2,7 +2,7 @@ package com.akka.training;
 
 import java.io.Serializable;
 
-interface Coffee extends Serializable {
+public interface Coffee extends Serializable {
 
   final class Akkaccino implements Coffee {
     @Override
