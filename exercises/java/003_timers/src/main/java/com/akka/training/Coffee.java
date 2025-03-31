@@ -3,7 +3,6 @@ package com.akka.training;
 import java.io.Serializable;
 
 public interface Coffee extends Serializable {
-
   final class Akkaccino implements Coffee {
     @Override
     public String toString() {

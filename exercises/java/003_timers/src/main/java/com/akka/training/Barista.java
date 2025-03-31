@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
-
   // Orders <Whom, Coffee>
   private final Map<String, Coffee> orders = new HashMap<>();
   // reference to the coffee-machine child actor, allowing to send messages to coffee machine

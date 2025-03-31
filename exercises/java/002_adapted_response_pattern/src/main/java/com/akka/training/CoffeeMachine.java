@@ -6,13 +6,13 @@ import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 
 public class CoffeeMachine {
-
   public static Behavior<CoffeeMachineCommand> create() {
-    return Behaviors.setup(context -> idle(context));
+    return Behaviors.setup(CoffeeMachine::idle);
   }
 
   private static Behavior<CoffeeMachineCommand> idle(
       final ActorContext<CoffeeMachineCommand> context) {
+
     context.getLog().info("CoffeeMachine: IDLE");
     return Behaviors.receive(CoffeeMachineCommand.class)
         .onMessage(BrewCoffee.class, command -> brewing(context, command))
@@ -24,6 +24,7 @@ public class CoffeeMachine {
 
   private static Behavior<CoffeeMachineCommand> brewing(
       final ActorContext<CoffeeMachineCommand> context, BrewCoffee brewingCoffee) {
+
     context.getLog().info("CoffeeMachine: Brewing 1 {}", brewingCoffee.coffee.toString());
     // Warn: Don't Thread.sleep in Akka actors, it utilizes a thread from the Thread pool.
     // We will see how to replace Thread.sleep by proper non-blocking scheduling in a further
@@ -39,6 +40,7 @@ public class CoffeeMachine {
 
   private static Behavior<CoffeeMachineCommand> coffeeReady(
       final ActorContext<CoffeeMachineCommand> context) {
+
     context.getLog().info("CoffeeMachine: Coffee is ready");
     return Behaviors.receive(CoffeeMachineCommand.class)
         // Can't brew a new coffee until the ready one is picked-up, stay in same behavior
