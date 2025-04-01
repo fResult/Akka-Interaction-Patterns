@@ -13,6 +13,7 @@ public class CoffeeMachine {
 
   private static Behavior<CoffeeMachineCommand> idle(
       final ActorContext<CoffeeMachineCommand> context) {
+
     context.getLog().info("CoffeeMachine: IDLE");
     return Behaviors.receive(CoffeeMachineCommand.class)
         .onMessage(BrewCoffee.class, command -> brewing(context, command.coffee))
