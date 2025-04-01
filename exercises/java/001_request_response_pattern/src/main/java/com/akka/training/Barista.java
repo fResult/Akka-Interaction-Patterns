@@ -42,16 +42,29 @@ public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
   public Receive<BaristaCommand> createReceive() {
     return newReceiveBuilder()
         .onMessage(OrderCoffee.class, this::onOrderCoffee)
+        .onMessage(CoffeeReady.class, this::onCoffeeReady)
         .build();
+  }
+
+  private Behavior<BaristaCommand> onOrderCoffee(OrderCoffee command) {
+    orders.put(command.whom, command.coffee);
+    getContext().getLog().info("Orders: {}", printOrders(orders.entrySet()));
+
+    // Send brew command to coffee machine
+    coffeeMachine.tell(new CoffeeMachine.BrewCoffee(command.coffee, getContext().getSelf()));
+
+    return this;
   }
 
   private Behavior<BaristaCommand> onCoffeeReady(CoffeeReady command) {
     getContext().getLog().info("Barista: Picking up {}", command.coffee);
 
+    coffeeMachine.tell(new CoffeeMachine.PickupCoffee());
 
     return this;
   }
 
+  // <- Protocol definition
   public interface BaristaCommand {}
 
   public static final class OrderCoffee implements BaristaCommand {
@@ -72,4 +85,5 @@ public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
       this.coffee = coffee;
     }
   }
+  // Protocol definition ->
 }

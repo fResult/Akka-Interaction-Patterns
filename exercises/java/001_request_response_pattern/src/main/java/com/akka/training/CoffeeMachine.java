@@ -8,7 +8,7 @@ import akka.actor.typed.javadsl.Behaviors;
 public class CoffeeMachine {
 
   public static Behavior<CoffeeMachineCommand> create() {
-    return Behaviors.setup(context -> idle(context));
+    return Behaviors.setup(CoffeeMachine::idle);
   }
 
   private static Behavior<CoffeeMachineCommand> idle(
@@ -16,7 +16,7 @@ public class CoffeeMachine {
 
     context.getLog().info("CoffeeMachine: IDLE");
     return Behaviors.receive(CoffeeMachineCommand.class)
-        .onMessage(BrewCoffee.class, command -> brewing(context, command.coffee))
+        .onMessage(BrewCoffee.class, command -> brewing(context, command))
         // Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore
         // the message)
         .onMessage(PickupCoffee.class, command -> Behaviors.same())
@@ -24,8 +24,9 @@ public class CoffeeMachine {
   }
 
   private static Behavior<CoffeeMachineCommand> brewing(
-      final ActorContext<CoffeeMachineCommand> context, Coffee coffee) {
-    context.getLog().info("CoffeeMachine: Brewing 1 {}", coffee.toString());
+      final ActorContext<CoffeeMachineCommand> context, BrewCoffee command) {
+
+    context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee);
     // Warn: Don't Thread.sleep in Akka actors, it utilizes a thread from the Thread pool.
     // We will see how to replace Thread.sleep by proper non-blocking scheduling in a further
     // exercise.
@@ -34,14 +35,16 @@ public class CoffeeMachine {
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    return coffeeReady(context);
+
+    command.replyTo.tell(new Barista.CoffeeReady(command.coffee));
+
+    return coffeeReady(context, command.coffee);
   }
 
-  // Protocol definition ->
-
   private static Behavior<CoffeeMachineCommand> coffeeReady(
-      final ActorContext<CoffeeMachineCommand> context) {
-    context.getLog().info("CoffeeMachine: Coffee is ready");
+      final ActorContext<CoffeeMachineCommand> context, Coffee coffee) {
+
+    context.getLog().info("CoffeeMachine: Coffee {} is ready", coffee);
     return Behaviors.receive(CoffeeMachineCommand.class)
         // Can't brew a new coffee until the ready one is picked-up, stay in same behavior
         // (equivalent to ignore the message)
@@ -64,8 +67,9 @@ public class CoffeeMachine {
   }
 
   /*
-  Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready
-  for the next coffee
+   * Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready
+   * for the next coffee
    */
   public static final class PickupCoffee implements CoffeeMachineCommand {}
+  // Protocol definition ->
 }

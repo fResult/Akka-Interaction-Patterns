@@ -30,13 +30,13 @@ public class CoffeeMachineTests {
     BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
         BehaviorTestKit.create(CoffeeMachine.create());
     TestInbox<Barista.BaristaCommand> baristaInbox = TestInbox.create();
-
+    var akkacino = new Coffee.Akkaccino();
     assertEquals(expectedInfoLog("CoffeeMachine: IDLE"), lastCapturedLogEvent(testKit));
     testKit.clearLog();
-    testKit.run(new CoffeeMachine.BrewCoffee(new Coffee.Akkaccino(), baristaInbox.getRef()));
+    testKit.run(new CoffeeMachine.BrewCoffee(akkacino, baristaInbox.getRef()));
     assertEquals(
         expectedInfoLog("CoffeeMachine: Brewing 1 Akkaccino"), offsetCapturedLogEvent(testKit, 1));
-    assertEquals(expectedInfoLog("CoffeeMachine: Coffee is ready"), lastCapturedLogEvent(testKit));
+    assertEquals(expectedInfoLog(String.format("CoffeeMachine: Coffee %s is ready", akkacino)), lastCapturedLogEvent(testKit));
 
     testKit.run(new CoffeeMachine.PickupCoffee());
 
