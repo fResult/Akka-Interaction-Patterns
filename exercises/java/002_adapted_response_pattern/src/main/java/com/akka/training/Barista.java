@@ -30,7 +30,7 @@ public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
   }
 
   // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
-  static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
+  public static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
     return orders.stream()
         .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
         .reduce((acc, s) -> acc + "," + s)

@@ -1,8 +1,9 @@
-package com.akka.training;
+package com.lightbend.training;
 
 import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
-import akka.actor.typed.ActorRef;
+import com.akka.training.Barista;
+import com.akka.training.Coffee;
 import com.typesafe.config.ConfigFactory;
 import org.junit.ClassRule;
 import org.junit.Test;
