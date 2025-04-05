@@ -6,14 +6,14 @@ import static org.junit.Assert.assertTrue;
 import akka.actor.testkit.typed.CapturedLogEvent;
 import akka.actor.testkit.typed.Effect;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
-import com.akka.training.Barista;
+import com.akka.training.BaristaActor;
 import com.akka.training.Coffee;
-import com.akka.training.CoffeeMachine;
+import com.akka.training.CoffeeMachineActor;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 
-public class BaristaTests {
+public class BaristaActorTests {
 
   /* Barista should log the work in progress orders when it receives a new order (OrderCoffee
    * message)
@@ -25,11 +25,11 @@ public class BaristaTests {
     final var whom2 = "Lisa";
     final var coffee2 = new Coffee.MochaPlay();
 
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
     testKit.clearLog();
-    testKit.run(new Barista.OrderCoffee(whom1, coffee1));
-    testKit.run(new Barista.OrderCoffee(whom2, coffee2));
+    testKit.run(new BaristaActor.OrderCoffee(whom1, coffee1));
+    testKit.run(new BaristaActor.OrderCoffee(whom2, coffee2));
     final var allLogEntries = testKit.getAllLogEntries();
 
     Map<String, Coffee> expectedOrders = new HashMap<>();
@@ -37,7 +37,7 @@ public class BaristaTests {
     expectedOrders.put(whom2, coffee2);
     CapturedLogEvent expectedLogEvent =
         TestsUtils.expectedInfoLog(
-            String.format("Orders:%s", Barista.printOrders(expectedOrders.entrySet())));
+            String.format("Orders:%s", BaristaActor.printOrders(expectedOrders.entrySet())));
     System.out.println(allLogEntries);
 
     assertEquals(allLogEntries.get(1), expectedLogEvent);
@@ -46,7 +46,7 @@ public class BaristaTests {
   // Barista should spawn a child actor CoffeeMachine with as actor name 'coffee-machine'
   @Test
   public void spawnCoffeeMachineChild() {
-    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var testKit = BehaviorTestKit.create(BaristaActor.create());
     final var effects = testKit.getAllEffects();
 
     final var spawnedEffectOpt =
@@ -68,7 +68,7 @@ public class BaristaTests {
 
   @Test
   public void baristaShouldCreateMessageAdapter() {
-    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var testKit = BehaviorTestKit.create(BaristaActor.create());
     final var effects = testKit.getAllEffects();
 
     // assertTrue(effects.stream().anyMatch(o -> o instanceof Effect.MessageAdapter));
@@ -79,17 +79,17 @@ public class BaristaTests {
   public void baristaShouldSendRequest() {
     final var whom = "Ben";
     final var coffee = new Coffee.Akkaccino();
-    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var testKit = BehaviorTestKit.create(BaristaActor.create());
     final var coffeeMachineInbox =
-        testKit.<CoffeeMachine.CoffeeMachineCommand>childInbox("coffee-machine");
+        testKit.<CoffeeMachineActor.CoffeeMachineCommand>childInbox("coffee-machine");
 
-    testKit.run(new Barista.OrderCoffee(whom, coffee));
+    testKit.run(new BaristaActor.OrderCoffee(whom, coffee));
 
     final var messages = coffeeMachineInbox.getAllReceived();
 
     assertEquals(1, messages.size());
 
-    final var brewCoffee = (CoffeeMachine.BrewCoffee) messages.getFirst();
+    final var brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.getFirst();
 
     assertEquals(brewCoffee.coffee, coffee);
     // message adapters have deterministic anonymous names, in the same way as a regular child

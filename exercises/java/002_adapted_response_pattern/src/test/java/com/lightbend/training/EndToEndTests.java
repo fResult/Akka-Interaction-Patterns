@@ -2,7 +2,7 @@ package com.lightbend.training;
 
 import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
-import com.akka.training.Barista;
+import com.akka.training.BaristaActor;
 import com.akka.training.Coffee;
 import com.typesafe.config.ConfigFactory;
 import org.junit.ClassRule;
@@ -22,13 +22,13 @@ public class EndToEndTests {
   // Pickup coffee action)
   @Test
   public void brewCoffee() {
-    final var barista = testKit.spawn(Barista.create(), "barista1");
+    final var barista = testKit.spawn(BaristaActor.create(), "barista1");
     final var coffee = new Coffee.Akkaccino();
     LoggingTestKit.info("Barista: Picking up " + coffee)
         .expect(
             testKit.system(),
             () -> {
-              barista.tell(new Barista.OrderCoffee("Lisa", coffee));
+              barista.tell(new BaristaActor.OrderCoffee("Lisa", coffee));
               return null;
             });
   }

@@ -5,9 +5,9 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 
-public class CoffeeMachine {
+public class CoffeeMachineActor {
   public static Behavior<CoffeeMachineCommand> create() {
-    return Behaviors.setup(CoffeeMachine::idle);
+    return Behaviors.setup(CoffeeMachineActor::idle);
   }
 
   private static Behavior<CoffeeMachineCommand> idle(

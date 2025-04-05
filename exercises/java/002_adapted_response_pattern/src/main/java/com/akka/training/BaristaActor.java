@@ -10,23 +10,23 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Barista extends AbstractBehavior<Barista.BaristaCommand> {
+public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> {
   // Orders <Whom, Coffee>
   private final Map<String, Coffee> orders = new HashMap<>();
   // reference to the coffee-machine child actor, allowing to send messages to coffee machine
-  private final ActorRef<CoffeeMachine.CoffeeMachineCommand> coffeeMachine;
+  private final ActorRef<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachine;
 
-  private Barista(ActorContext<BaristaCommand> context) {
+  private BaristaActor(ActorContext<BaristaCommand> context) {
     super(context);
     // We spawn the CoffeeMachine as child actor in the private constructor where we have access to
     // both context and class fields.
     // It returns an ActorRef that we need to keep in the state, we will need it to interact with
     // the CoffeeMachine.
-    coffeeMachine = context.spawn(CoffeeMachine.create(), "coffee-machine");
+    coffeeMachine = context.spawn(CoffeeMachineActor.create(), "coffee-machine");
   }
 
   public static Behavior<BaristaCommand> create() {
-    return Behaviors.setup(Barista::new);
+    return Behaviors.setup(BaristaActor::new);
   }
 
   // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
