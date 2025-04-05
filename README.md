@@ -6,6 +6,9 @@ course OFFERED BY [AKKADEMY](https://akkademy.io)
 
 ## Prerequisites
 
+- JDK 23 or more
+- IntelliJ IDEA or your preferred IDE
+
 ## Dependencies Upgraded from the actual exercises
 
 ### Akka Profile dependencies
