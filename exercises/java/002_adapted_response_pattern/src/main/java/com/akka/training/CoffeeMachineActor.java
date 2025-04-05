@@ -14,16 +14,16 @@ public class CoffeeMachineActor {
       final ActorContext<CoffeeMachineCommand> context) {
 
     context.getLog().info("CoffeeMachine: IDLE");
+
     return Behaviors.receive(CoffeeMachineCommand.class)
         .onMessage(BrewCoffee.class, command -> brewing(context, command))
-        // Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore
-        // the message)
+        /* Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore the message) */
         .onMessage(PickupCoffee.class, command -> Behaviors.same())
         .build();
   }
 
   private static Behavior<CoffeeMachineCommand> brewing(
-      final ActorContext<CoffeeMachineCommand> context, BrewCoffee command) {
+      final ActorContext<CoffeeMachineCommand> context, final BrewCoffee command) {
 
     context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee());
     // Warn: Don't Thread.sleep in Akka actors, it utilizes a thread from the Thread pool.
@@ -39,24 +39,23 @@ public class CoffeeMachineActor {
   }
 
   private static Behavior<CoffeeMachineCommand> coffeeReady(
-      final ActorContext<CoffeeMachineCommand> context, Coffee coffee) {
+      final ActorContext<CoffeeMachineCommand> context, final Coffee coffee) {
 
     context.getLog().info("CoffeeMachine: Coffee {} is ready", coffee);
     return Behaviors.receive(CoffeeMachineCommand.class)
-        // Can't brew a new coffee until the ready one is picked-up, stay in same behavior
-        // (equivalent to ignore the message)
+        /* Can't brew a new coffee until the ready one is picked-up, stay in same behavior (equivalent to ignore the message) */
         .onMessage(BrewCoffee.class, command -> Behaviors.same())
         .onMessage(PickupCoffee.class, command -> idle(context))
         .build();
   }
 
   // <- Protocol definition
-  public sealed interface CoffeeMachineCommand permits BrewCoffee, CoffeeIsReady, PickupCoffee {}
+  public sealed interface CoffeeMachineCommand permits BrewCoffee, CoffeeReady, PickupCoffee {}
 
-  public record BrewCoffee(Coffee coffee, ActorRef<CoffeeIsReady> replyTo)
+  public record BrewCoffee(Coffee coffee, ActorRef<CoffeeReady> replyTo)
       implements CoffeeMachineCommand {}
 
-  public record CoffeeIsReady(Coffee coffee) implements CoffeeMachineCommand {}
+  public record CoffeeReady(Coffee coffee) implements CoffeeMachineCommand {}
 
   /* Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready for the next coffee */
   public record PickupCoffee() implements CoffeeMachineCommand {}

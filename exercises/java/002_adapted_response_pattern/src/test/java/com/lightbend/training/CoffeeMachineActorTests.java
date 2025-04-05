@@ -18,7 +18,7 @@ public class CoffeeMachineActorTests {
   @Test
   public void brewing() {
     final var testKit = BehaviorTestKit.create(CoffeeMachineActor.create());
-    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeIsReady>create();
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeReady>create();
 
     assertEquals(expectedInfoLog("CoffeeMachine: IDLE"), lastCapturedLogEvent(testKit));
     testKit.clearLog();
@@ -32,7 +32,7 @@ public class CoffeeMachineActorTests {
   @Test
   public void fullCycle() {
     final var testKit = BehaviorTestKit.create(CoffeeMachineActor.create());
-    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeIsReady>create();
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeReady>create();
 
     assertEquals(expectedInfoLog("CoffeeMachine: IDLE"), lastCapturedLogEvent(testKit));
     testKit.clearLog();
@@ -53,7 +53,7 @@ public class CoffeeMachineActorTests {
   @Test
   public void restartCycle() {
     final var testKit = BehaviorTestKit.create(CoffeeMachineActor.create());
-    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeIsReady>create();
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeReady>create();
 
     testKit.run(
         new CoffeeMachineActor.BrewCoffee(new Coffee.Akkaccino(), baristaMessageAdapter.getRef()));
@@ -71,21 +71,21 @@ public class CoffeeMachineActorTests {
   @Test
   public void shouldSendReadySignalToBarista() {
     final var testKit = BehaviorTestKit.create(CoffeeMachineActor.create());
-    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeIsReady>create();
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeReady>create();
 
     testKit.run(new CoffeeMachineActor.BrewCoffee(CAFFE_JAVA, baristaMessageAdapter.getRef()));
 
     final var coffeesReady = baristaMessageAdapter.getAllReceived();
     assertEquals(1, coffeesReady.size());
 
-    CoffeeMachineActor.CoffeeIsReady readyCoffee = coffeesReady.getFirst();
+    CoffeeMachineActor.CoffeeReady readyCoffee = coffeesReady.getFirst();
     assertEquals(CAFFE_JAVA, readyCoffee.coffee());
   }
 
   @Test
   public void shouldNotProcessCoffeesUntilReset() {
     final var testKit = BehaviorTestKit.create(CoffeeMachineActor.create());
-    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeIsReady>create();
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachineActor.CoffeeReady>create();
 
     testKit.run(new CoffeeMachineActor.BrewCoffee(MOCHA_PLAY, baristaMessageAdapter.getRef()));
     testKit.run(new CoffeeMachineActor.BrewCoffee(AKKACINO, baristaMessageAdapter.getRef()));

@@ -18,12 +18,13 @@ public class EndToEndTests {
               .withFallback(ConfigFactory.load()));
 
   // Test if the system [Barista + Coffee machine] is able to a full cycle
-  // (When the coffee machine child actor send back a CoffeeIsReady message, the Barista log its
+  // (When the coffee machine child actor send back a CoffeeReady message, the Barista log its
   // Pickup coffee action)
   @Test
   public void brewCoffee() {
     final var barista = testKit.spawn(BaristaActor.create(), "barista1");
     final var coffee = new Coffee.Akkaccino();
+
     LoggingTestKit.info("Barista: Picking up " + coffee)
         .expect(
             testKit.system(),

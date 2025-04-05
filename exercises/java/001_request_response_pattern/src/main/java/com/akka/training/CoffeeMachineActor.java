@@ -42,7 +42,7 @@ public class CoffeeMachineActor {
   }
 
   private static Behavior<CoffeeMachineCommand> coffeeReady(
-      final ActorContext<CoffeeMachineCommand> context, Coffee coffee) {
+      final ActorContext<CoffeeMachineCommand> context, final Coffee coffee) {
 
     context.getLog().info("CoffeeMachine: Coffee {} is ready", coffee);
     return Behaviors.receive(CoffeeMachineCommand.class)

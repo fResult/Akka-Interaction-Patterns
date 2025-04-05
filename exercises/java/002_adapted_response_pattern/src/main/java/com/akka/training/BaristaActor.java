@@ -30,7 +30,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
   }
 
   // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
-  public static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
+  public static String printOrders(final Set<Map.Entry<String, Coffee>> orders) {
     return orders.stream()
         .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
         .reduce((acc, s) -> acc + "," + s)
@@ -43,7 +43,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
     return newReceiveBuilder().onMessage(OrderCoffee.class, this::onOrderCoffee).build();
   }
 
-  private Behavior<BaristaCommand> onOrderCoffee(OrderCoffee command) {
+  private Behavior<BaristaCommand> onOrderCoffee(final OrderCoffee command) {
     orders.put(command.whom, command.coffee);
     getContext().getLog().info("Orders: {}", printOrders(orders.entrySet()));
 

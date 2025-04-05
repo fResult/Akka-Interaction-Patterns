@@ -10,7 +10,7 @@ Instead, the **Barista** will use a message adapter to handle the response.
 
 ### Key Changes
 
-- The `CoffeeIsReady` message type is now part of the `CoffeeMachine`'s protocol, not the `Barista`'s.
+- The `CoffeeReady` message type is now part of the `CoffeeMachine`'s protocol, not the `Barista`'s.
 - The `Barista` will adapt the response to its own protocol using a message adapter.
 
 ## Instructions
@@ -25,7 +25,7 @@ Instead, the **Barista** will use a message adapter to handle the response.
       ```
 
 2. **Edit `CoffeeMachine.java`**:
-    - Update the implementation so that the `CoffeeMachine` sends a `CoffeeIsReady` message when the coffee is brewed.
+    - Update the implementation so that the `CoffeeMachine` sends a `CoffeeReady` message when the coffee is brewed.
 
 3. **Run the Tests**:
     - Validate your implementation by running the unit tests:
