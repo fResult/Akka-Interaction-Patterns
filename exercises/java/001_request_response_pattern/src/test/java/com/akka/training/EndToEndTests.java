@@ -21,13 +21,13 @@ public class EndToEndTests {
   // Pickup coffee action)
   @Test
   public void brewCoffee() {
-    ActorRef<Barista.BaristaCommand> barista = testKit.spawn(Barista.create(), "barista1");
+    ActorRef<BaristaActor.BaristaCommand> barista = testKit.spawn(BaristaActor.create(), "barista1");
     var coffee = new Coffee.Akkaccino();
     LoggingTestKit.info("Barista: Picking up " + coffee)
         .expect(
             testKit.system(),
             () -> {
-              barista.tell(new Barista.OrderCoffee("Lisa", coffee));
+              barista.tell(new BaristaActor.OrderCoffee("Lisa", coffee));
               return null;
             });
   }

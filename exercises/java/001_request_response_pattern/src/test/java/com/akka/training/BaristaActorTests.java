@@ -14,22 +14,22 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 
-public class BaristaTests {
+public class BaristaActorTests {
 
   // Barista should log the work in progress orders when it receives a new order (OrderCoffee
   // message)
   @Test
   public void baristaShouldLogReceivingOrder() {
-    var whom1 = "Bart";
-    var coffee1 = new Coffee.Akkaccino();
-    var whom2 = "Lisa";
-    var coffee2 = new Coffee.MochaPlay();
+    final var whom1 = "Bart";
+    final var coffee1 = new Coffee.Akkaccino();
+    final var whom2 = "Lisa";
+    final var coffee2 = new Coffee.MochaPlay();
 
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
     testKit.clearLog();
-    testKit.run(new Barista.OrderCoffee(whom1, coffee1));
-    testKit.run(new Barista.OrderCoffee(whom2, coffee2));
+    testKit.run(new BaristaActor.OrderCoffee(whom1, coffee1));
+    testKit.run(new BaristaActor.OrderCoffee(whom2, coffee2));
     List<CapturedLogEvent> allLogEntries = testKit.getAllLogEntries();
 
     Map<String, Coffee> expectedOrders = new HashMap<>();
@@ -37,7 +37,7 @@ public class BaristaTests {
     expectedOrders.put(whom2, coffee2);
     CapturedLogEvent expectedLogEvent =
         TestsUtils.expectedInfoLog(
-            String.format("Orders: %s", Barista.printOrders(expectedOrders.entrySet())));
+            String.format("Orders: %s", BaristaActor.printOrders(expectedOrders.entrySet())));
     System.out.println(allLogEntries);
 
     assertEquals(allLogEntries.get(1), expectedLogEvent);
@@ -46,26 +46,26 @@ public class BaristaTests {
   // Barista should spawn a child actor CoffeeMachine with as actor name 'coffee-machine'
   @Test
   public void spawnCoffeeMachineChild() {
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
     assertEquals("coffee-machine", testKit.expectEffectClass(Effect.Spawned.class).childName());
   }
 
   @Test
   public void baristaShouldSendRequest() {
-    var whom = "Ben";
-    var coffee = new Coffee.Akkaccino();
+    final var whom = "Ben";
+    final var coffee = new Coffee.Akkaccino();
 
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
-    TestInbox<CoffeeMachine.CoffeeMachineCommand> coffeeMachineInbox =
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    TestInbox<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachineInbox =
         testKit.childInbox("coffee-machine");
 
-    testKit.run(new Barista.OrderCoffee(whom, coffee));
+    testKit.run(new BaristaActor.OrderCoffee(whom, coffee));
 
     var messages = coffeeMachineInbox.getAllReceived();
 
     assertEquals(1, messages.size());
 
-    CoffeeMachine.BrewCoffee brewCoffee = (CoffeeMachine.BrewCoffee) messages.get(0);
+    CoffeeMachineActor.BrewCoffee brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.get(0);
 
     assertEquals(brewCoffee.coffee, coffee);
     assertEquals(brewCoffee.replyTo, testKit.getRef());
@@ -73,11 +73,11 @@ public class BaristaTests {
 
   @Test
   public void baristaShouldHandleResponse() {
-    var coffee = new Coffee.CaffeJava();
+    final var coffee = new Coffee.CaffeJava();
 
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
-    testKit.run(new Barista.CoffeeReady(coffee));
+    testKit.run(new BaristaActor.CoffeeReady(coffee));
 
     List<CapturedLogEvent> allLogEntries = testKit.getAllLogEntries();
     assertEquals(1, allLogEntries.size());
@@ -87,17 +87,17 @@ public class BaristaTests {
 
   @Test
   public void baristaShouldPickupCoffee() {
-    var coffee = new Coffee.MochaPlay();
+    final var coffee = new Coffee.MochaPlay();
 
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
-    TestInbox<CoffeeMachine.CoffeeMachineCommand> coffeeMachineInbox =
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    TestInbox<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachineInbox =
         testKit.childInbox("coffee-machine");
 
-    testKit.run(new Barista.CoffeeReady(coffee));
+    testKit.run(new BaristaActor.CoffeeReady(coffee));
 
     var messages = coffeeMachineInbox.getAllReceived();
     assertEquals(1, messages.size());
 
-    assertTrue(messages.get(0) instanceof CoffeeMachine.PickupCoffee);
+    assertTrue(messages.get(0) instanceof CoffeeMachineActor.PickupCoffee);
   }
 }
