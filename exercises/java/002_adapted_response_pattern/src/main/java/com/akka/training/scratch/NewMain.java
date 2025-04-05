@@ -84,7 +84,14 @@ class CoffeeMachineAct {
     }
 
     command.replyTo().tell(new CoffeeMachineCommand.CoffeeReady(command.coffee()));
+
+    return coffeeReady(command, context);
+  }
+
+  private static Behavior<CoffeeMachineCommand> coffeeReady(
+      CoffeeMachineCommand.BrewCoffee command, ActorContext<CoffeeMachineCommand> context) {
     context.getLog().info("CoffeeMachine: Coffee {} is ready", command.coffee());
+
     return Behaviors.receive(CoffeeMachineCommand.class)
         .onMessage(CoffeeMachineCommand.BrewCoffee.class, brewCoffeeCommand2 -> Behaviors.same())
         .onMessage(CoffeeMachineCommand.PickupCoffee.class, pickupCoffeeCommand -> idle(context))
