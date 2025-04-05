@@ -50,32 +50,15 @@ public class CoffeeMachineActor {
         .build();
   }
 
-  // Protocol definition ->
-
   // <- Protocol definition
-  public interface CoffeeMachineCommand {}
+  public sealed interface CoffeeMachineCommand permits BrewCoffee, CoffeeIsReady, PickupCoffee {}
 
-  public static final class BrewCoffee implements CoffeeMachineCommand {
-    public final Coffee coffee;
-    public final ActorRef<CoffeeIsReady> replyTo;
+  public record BrewCoffee(Coffee coffee, ActorRef<CoffeeIsReady> replyTo)
+      implements CoffeeMachineCommand {}
 
-    public BrewCoffee(Coffee coffee, ActorRef<CoffeeIsReady> replyTo) {
-      this.coffee = coffee;
-      this.replyTo = replyTo;
-    }
-  }
+  public record CoffeeIsReady(Coffee coffee) implements CoffeeMachineCommand {}
 
-  public static final class CoffeeIsReady implements CoffeeMachineCommand {
-    public final Coffee coffee;
-
-    public CoffeeIsReady(Coffee coffee) {
-      this.coffee = coffee;
-    }
-  }
-
-  /*
-  Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready
-  for the next coffee
-   */
-  public static final class PickupCoffee implements CoffeeMachineCommand {}
+  /* Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready for the next coffee */
+  public record PickupCoffee() implements CoffeeMachineCommand {}
+  // Protocol definition ->
 }
