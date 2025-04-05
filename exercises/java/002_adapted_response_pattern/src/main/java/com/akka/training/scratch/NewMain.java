@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-
 public class NewMain {
   public static void main(String... args) {
     final var baristaActor = ActorSystem.create(BaristaAct.create(), "barista");
@@ -60,45 +59,37 @@ class BaristaAct extends AbstractBehavior<BaristaCommand> {
 
 class CoffeeMachineAct {
   public static Behavior<CoffeeMachineCommand> create() {
-    return Behaviors.setup(
-        context -> idle(context));
+    return Behaviors.setup(CoffeeMachineAct::idle);
   }
 
   private static Behavior<CoffeeMachineCommand> idle(ActorContext<CoffeeMachineCommand> context) {
-          context.getLog().info("CoffeeMachine: IDLE");
+    context.getLog().info("CoffeeMachine: IDLE");
 
-          return Behaviors.receive(CoffeeMachineCommand.class)
-              .onMessage(
-                  CoffeeMachineCommand.BrewCoffee.class,
-                  brewCoffeeCommand -> {
-                    context
-                        .getLog()
-                        .info("CoffeeMachine: Brewing 1 {}", brewCoffeeCommand.coffee());
+    return Behaviors.receive(CoffeeMachineCommand.class)
+        .onMessage(
+            CoffeeMachineCommand.BrewCoffee.class,
+            brewCoffeeCommand -> brewCoffee(brewCoffeeCommand, context))
+        .onMessage(CoffeeMachineCommand.PickupCoffee.class, pickupCommand -> Behaviors.same())
+        .build();
+  }
 
-                    try {
-                      Thread.sleep(3000);
-                    } catch (InterruptedException ex) {
-                      ex.printStackTrace();
-                    }
+  private static Behavior<CoffeeMachineCommand> brewCoffee(
+      CoffeeMachineCommand.BrewCoffee command, ActorContext<CoffeeMachineCommand> context) {
+    context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee());
 
-                    brewCoffeeCommand
-                        .replyTo()
-                        .tell(new CoffeeMachineCommand.CoffeeReady(brewCoffeeCommand.coffee()));
-                    context
-                        .getLog()
-                        .info("CoffeeMachine: Coffee {} is ready", brewCoffeeCommand.coffee());
-                    return Behaviors.receive(CoffeeMachineCommand.class)
-                        .onMessage(
-                            CoffeeMachineCommand.BrewCoffee.class,
-                            brewCoffeeCommand2 -> Behaviors.same())
-                        .onMessage(CoffeeMachineCommand.PickupCoffee.class, pickupCoffeeCommand -> idle(context))
-                        .build();
-                  })
-              .onMessage(CoffeeMachineCommand.PickupCoffee.class, pickupCommand -> Behaviors.same())
-              .build();
-        }
+    try {
+      Thread.sleep(3000);
+    } catch (InterruptedException ex) {
+      ex.printStackTrace();
+    }
 
-
+    command.replyTo().tell(new CoffeeMachineCommand.CoffeeReady(command.coffee()));
+    context.getLog().info("CoffeeMachine: Coffee {} is ready", command.coffee());
+    return Behaviors.receive(CoffeeMachineCommand.class)
+        .onMessage(CoffeeMachineCommand.BrewCoffee.class, brewCoffeeCommand2 -> Behaviors.same())
+        .onMessage(CoffeeMachineCommand.PickupCoffee.class, pickupCoffeeCommand -> idle(context))
+        .build();
+  }
 }
 
 sealed interface BaristaCommand permits BaristaCommand.OrderCoffee, BaristaCommand.CoffeeReady {
