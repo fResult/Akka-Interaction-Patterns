@@ -25,7 +25,8 @@ public class BaristaActorTests {
     final var whom2 = "Lisa";
     final var coffee2 = new Coffee.MochaPlay();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
+        BehaviorTestKit.create(BaristaActor.create());
 
     testKit.clearLog();
     testKit.run(new BaristaActor.OrderCoffee(whom1, coffee1));
@@ -46,7 +47,8 @@ public class BaristaActorTests {
   // Barista should spawn a child actor CoffeeMachine with as actor name 'coffee-machine'
   @Test
   public void spawnCoffeeMachineChild() {
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
+        BehaviorTestKit.create(BaristaActor.create());
     assertEquals("coffee-machine", testKit.expectEffectClass(Effect.Spawned.class).childName());
   }
 
@@ -55,7 +57,8 @@ public class BaristaActorTests {
     final var whom = "Ben";
     final var coffee = new Coffee.Akkaccino();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
+        BehaviorTestKit.create(BaristaActor.create());
     TestInbox<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachineInbox =
         testKit.childInbox("coffee-machine");
 
@@ -75,7 +78,8 @@ public class BaristaActorTests {
   public void baristaShouldHandleResponse() {
     final var coffee = new Coffee.CaffeJava();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
+        BehaviorTestKit.create(BaristaActor.create());
 
     testKit.run(new BaristaActor.CoffeeReady(coffee));
 
@@ -89,7 +93,8 @@ public class BaristaActorTests {
   public void baristaShouldPickupCoffee() {
     final var coffee = new Coffee.MochaPlay();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
+        BehaviorTestKit.create(BaristaActor.create());
     TestInbox<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachineInbox =
         testKit.childInbox("coffee-machine");
 
