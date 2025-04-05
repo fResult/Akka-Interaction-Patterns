@@ -35,6 +35,8 @@ public class CoffeeMachineActor {
       e.printStackTrace();
     }
 
+    command.replyTo.tell(new CoffeeReady(command.coffee()));
+
     return coffeeReady(context, command.coffee());
   }
 
