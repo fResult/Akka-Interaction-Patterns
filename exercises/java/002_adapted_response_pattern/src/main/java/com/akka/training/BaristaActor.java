@@ -45,7 +45,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
   private Behavior<BaristaCommand> onOrderCoffee(OrderCoffee command) {
     orders.put(command.whom, command.coffee);
-    getContext().getLog().info("Orders:{}", printOrders(orders.entrySet()));
+    getContext().getLog().info("Orders: {}", printOrders(orders.entrySet()));
 
     return this;
   }

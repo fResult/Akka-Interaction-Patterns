@@ -36,7 +36,7 @@ public class BaristaActorTests {
     expectedOrders.put(whom2, coffee2);
     CapturedLogEvent expectedLogEvent =
         TestsUtils.expectedInfoLog(
-            String.format("Orders:%s", BaristaActor.printOrders(expectedOrders.entrySet())));
+            String.format("Orders: %s", BaristaActor.printOrders(expectedOrders.entrySet())));
     System.out.println(allLogEntries);
 
     assertEquals(allLogEntries.get(1), expectedLogEvent);
