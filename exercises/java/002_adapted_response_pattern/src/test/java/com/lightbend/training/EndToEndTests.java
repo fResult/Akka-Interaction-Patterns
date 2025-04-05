@@ -22,8 +22,8 @@ public class EndToEndTests {
   // Pickup coffee action)
   @Test
   public void brewCoffee() {
-    ActorRef<Barista.BaristaCommand> barista = testKit.spawn(Barista.create(), "barista1");
-    var coffee = new Coffee.Akkaccino();
+    final var barista = testKit.spawn(Barista.create(), "barista1");
+    final var coffee = new Coffee.Akkaccino();
     LoggingTestKit.info("Barista: Picking up " + coffee)
         .expect(
             testKit.system(),

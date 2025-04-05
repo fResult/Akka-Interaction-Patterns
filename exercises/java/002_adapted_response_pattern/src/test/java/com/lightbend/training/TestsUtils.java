@@ -14,13 +14,14 @@ class TestsUtils {
   }
 
   public static <T> CapturedLogEvent lastCapturedLogEvent(BehaviorTestKit<T> testKit) {
-    var logs = testKit.getAllLogEntries();
+    final var logs = testKit.getAllLogEntries();
     return logs.get(logs.size() - 1);
   }
 
   public static <T> CapturedLogEvent offsetCapturedLogEvent(
       BehaviorTestKit<T> testKit, int offsetFromEnd) {
-    var logs = testKit.getAllLogEntries();
+
+    final var logs = testKit.getAllLogEntries();
     if (offsetFromEnd > 0 && offsetFromEnd <= logs.size()) {
       return logs.get(logs.size() - offsetFromEnd - 1);
     } else {
