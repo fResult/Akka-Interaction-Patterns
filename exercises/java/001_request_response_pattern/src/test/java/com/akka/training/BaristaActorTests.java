@@ -68,7 +68,7 @@ public class BaristaActorTests {
 
     assertEquals(1, messages.size());
 
-    CoffeeMachineActor.BrewCoffee brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.get(0);
+    CoffeeMachineActor.BrewCoffee brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.getFirst();
 
     assertEquals(brewCoffee.coffee, coffee);
     assertEquals(brewCoffee.replyTo, testKit.getRef());
@@ -86,7 +86,7 @@ public class BaristaActorTests {
     List<CapturedLogEvent> allLogEntries = testKit.getAllLogEntries();
     assertEquals(1, allLogEntries.size());
 
-    assertEquals(expectedInfoLog("Barista: Picking up CaffeJava"), lastCapturedLogEvent(testKit));
+    assertEquals(expectedInfoLog(String.format("Barista: Picking up %s", coffee)), lastCapturedLogEvent(testKit));
   }
 
   @Test
