@@ -49,7 +49,7 @@ public class BaristaTests {
     final var testKit = BehaviorTestKit.create(Barista.create());
     final var effects = testKit.getAllEffects();
 
-    final var spawnEffectOpt =
+    final var spawnedEffectOpt =
         effects.stream()
             // .filter( e -> e instanceof Effect.Spawned)
             .filter(Effect.Spawned.class::isInstance)
@@ -63,7 +63,7 @@ public class BaristaTests {
        assertEquals("coffee-machine", spawnedEffect.childName());
      });
     */
-    spawnEffectOpt.ifPresent(effect -> assertEquals("coffee-machine", effect.childName()));
+    spawnedEffectOpt.ifPresent(effect -> assertEquals("coffee-machine", effect.childName()));
   }
 
   @Test
