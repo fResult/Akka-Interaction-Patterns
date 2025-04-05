@@ -14,9 +14,8 @@ public class CoffeeMachineTests {
   // CoffeeMachine should transition from IDLE to Brewing on receiving BrewCoffee message
   @Test
   public void brewing() {
-    BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
-        BehaviorTestKit.create(CoffeeMachine.create());
-    TestInbox<CoffeeMachine.CoffeeIsReady> baristaMessageAdapter = TestInbox.create();
+    final var testKit = BehaviorTestKit.create(CoffeeMachine.create());
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachine.CoffeeIsReady>create();
 
     assertEquals(expectedInfoLog("CoffeeMachine: IDLE"), lastCapturedLogEvent(testKit));
     testKit.clearLog();
@@ -29,9 +28,8 @@ public class CoffeeMachineTests {
   // CoffeeMachine should transition between its states along the full cycle
   @Test
   public void fullCycle() {
-    BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
-        BehaviorTestKit.create(CoffeeMachine.create());
-    TestInbox<CoffeeMachine.CoffeeIsReady> baristaMessageAdapter = TestInbox.create();
+    final var testKit = BehaviorTestKit.create(CoffeeMachine.create());
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachine.CoffeeIsReady>create();
 
     assertEquals(expectedInfoLog("CoffeeMachine: IDLE"), lastCapturedLogEvent(testKit));
     testKit.clearLog();
@@ -49,9 +47,8 @@ public class CoffeeMachineTests {
   // CoffeeMachine should be able to start a new cycle after completing one
   @Test
   public void restartCycle() {
-    BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
-        BehaviorTestKit.create(CoffeeMachine.create());
-    TestInbox<CoffeeMachine.CoffeeIsReady> baristaMessageAdapter = TestInbox.create();
+    final var testKit = BehaviorTestKit.create(CoffeeMachine.create());
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachine.CoffeeIsReady>create();
 
     testKit.run(
         new CoffeeMachine.BrewCoffee(new Coffee.Akkaccino(), baristaMessageAdapter.getRef()));
@@ -66,15 +63,14 @@ public class CoffeeMachineTests {
 
   @Test
   public void shouldSendReadySignalToBarista() {
-    var coffee = new Coffee.CaffeJava();
+    final var coffee = new Coffee.CaffeJava();
 
-    BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
-        BehaviorTestKit.create(CoffeeMachine.create());
-    TestInbox<CoffeeMachine.CoffeeIsReady> baristaMessageAdapter = TestInbox.create();
+    final var testKit = BehaviorTestKit.create(CoffeeMachine.create());
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachine.CoffeeIsReady>create();
 
     testKit.run(new CoffeeMachine.BrewCoffee(coffee, baristaMessageAdapter.getRef()));
 
-    List<CoffeeMachine.CoffeeIsReady> coffeesReady = baristaMessageAdapter.getAllReceived();
+    final var coffeesReady = baristaMessageAdapter.getAllReceived();
     assertEquals(1, coffeesReady.size());
 
     CoffeeMachine.CoffeeIsReady readyCoffee = coffeesReady.get(0);
@@ -83,20 +79,19 @@ public class CoffeeMachineTests {
 
   @Test
   public void shouldNotProcessCoffeesUntilReset() {
-    var coffee1 = new Coffee.MochaPlay();
-    var coffee2 = new Coffee.Akkaccino();
+    final var coffee1 = new Coffee.MochaPlay();
+    final var coffee2 = new Coffee.Akkaccino();
 
-    BehaviorTestKit<CoffeeMachine.CoffeeMachineCommand> testKit =
-        BehaviorTestKit.create(CoffeeMachine.create());
-    TestInbox<CoffeeMachine.CoffeeIsReady> baristaMessageAdapter = TestInbox.create();
+    final var testKit = BehaviorTestKit.create(CoffeeMachine.create());
+    final var baristaMessageAdapter = TestInbox.<CoffeeMachine.CoffeeIsReady>create();
 
     testKit.run(new CoffeeMachine.BrewCoffee(coffee1, baristaMessageAdapter.getRef()));
     testKit.run(new CoffeeMachine.BrewCoffee(coffee2, baristaMessageAdapter.getRef()));
 
-    List<CoffeeMachine.CoffeeIsReady> coffeesReady = baristaMessageAdapter.getAllReceived();
+    final var coffeesReady = baristaMessageAdapter.getAllReceived();
     assertEquals(1, coffeesReady.size());
 
-    CoffeeMachine.CoffeeIsReady readyCoffee = coffeesReady.get(0);
+    final var readyCoffee = coffeesReady.getFirst();
     assertEquals(coffee1, readyCoffee.coffee);
   }
 }
