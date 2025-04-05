@@ -35,13 +35,13 @@ public class CoffeeMachineActor {
       e.printStackTrace();
     }
 
-    return coffeeReady(context);
+    return coffeeReady(context, command.coffee());
   }
 
   private static Behavior<CoffeeMachineCommand> coffeeReady(
-      final ActorContext<CoffeeMachineCommand> context) {
+      final ActorContext<CoffeeMachineCommand> context, Coffee coffee) {
 
-    context.getLog().info("CoffeeMachine: Coffee is ready");
+    context.getLog().info("CoffeeMachine: Coffee {} is ready", coffee);
     return Behaviors.receive(CoffeeMachineCommand.class)
         // Can't brew a new coffee until the ready one is picked-up, stay in same behavior
         // (equivalent to ignore the message)
