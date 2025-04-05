@@ -23,9 +23,9 @@ public class CoffeeMachineActor {
   }
 
   private static Behavior<CoffeeMachineCommand> brewing(
-      final ActorContext<CoffeeMachineCommand> context, BrewCoffee brewingCoffee) {
+      final ActorContext<CoffeeMachineCommand> context, BrewCoffee command) {
 
-    context.getLog().info("CoffeeMachine: Brewing 1 {}", brewingCoffee.coffee.toString());
+    context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee());
     // Warn: Don't Thread.sleep in Akka actors, it utilizes a thread from the Thread pool.
     // We will see how to replace Thread.sleep by proper non-blocking scheduling in a further
     // exercise.

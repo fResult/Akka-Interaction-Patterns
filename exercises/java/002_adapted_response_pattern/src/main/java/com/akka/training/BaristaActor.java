@@ -50,15 +50,9 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
     return this;
   }
 
-  public interface BaristaCommand {}
+  // <- Protocol definition
+  public sealed interface BaristaCommand permits OrderCoffee {}
 
-  public static final class OrderCoffee implements BaristaCommand {
-    public final String whom;
-    public final Coffee coffee;
-
-    public OrderCoffee(String whom, Coffee coffee) {
-      this.whom = whom;
-      this.coffee = coffee;
-    }
-  }
+  public record OrderCoffee(String whom, Coffee coffee) implements BaristaCommand {}
+  // Protocol definition ->
 }

@@ -10,7 +10,6 @@ import com.akka.training.BaristaActor;
 import com.akka.training.Coffee;
 import com.akka.training.CoffeeMachineActor;
 import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 
 public class BaristaActorTests {
@@ -25,14 +24,14 @@ public class BaristaActorTests {
     final var whom2 = "Lisa";
     final var coffee2 = new Coffee.MochaPlay();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
+    final var testKit = BehaviorTestKit.create(BaristaActor.create());
 
     testKit.clearLog();
     testKit.run(new BaristaActor.OrderCoffee(whom1, coffee1));
     testKit.run(new BaristaActor.OrderCoffee(whom2, coffee2));
     final var allLogEntries = testKit.getAllLogEntries();
 
-    Map<String, Coffee> expectedOrders = new HashMap<>();
+    final var expectedOrders = new HashMap<String, Coffee>();
     expectedOrders.put(whom1, coffee1);
     expectedOrders.put(whom2, coffee2);
     CapturedLogEvent expectedLogEvent =
@@ -91,10 +90,10 @@ public class BaristaActorTests {
 
     final var brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.getFirst();
 
-    assertEquals(brewCoffee.coffee, coffee);
+    assertEquals(brewCoffee.coffee(), coffee);
     // message adapters have deterministic anonymous names, in the same way as a regular child
     // for reference see:
     // https://doc.akka.io/docs/akka/current/typed/testing-sync.html#sending-messages
-    assertEquals(brewCoffee.replyTo, testKit.childInbox("$a-adapter").getRef());
+    assertEquals(brewCoffee.replyTo(), testKit.childInbox("$a-adapter").getRef());
   }
 }
