@@ -10,27 +10,27 @@ import com.akka.training.Barista;
 import com.akka.training.Coffee;
 import com.akka.training.CoffeeMachine;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 
 public class BaristaTests {
 
-  // Barista should log the work in progress orders when it receives a new order (OrderCoffee
-  // message)
+  /* Barista should log the work in progress orders when it receives a new order (OrderCoffee
+   * message)
+   */
   @Test
   public void baristaShouldLogReceivingOrder() {
-    var whom1 = "Bart";
-    var coffee1 = new Coffee.Akkaccino();
-    var whom2 = "Lisa";
-    var coffee2 = new Coffee.MochaPlay();
+    final var whom1 = "Bart";
+    final var coffee1 = new Coffee.Akkaccino();
+    final var whom2 = "Lisa";
+    final var coffee2 = new Coffee.MochaPlay();
 
     BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
 
     testKit.clearLog();
     testKit.run(new Barista.OrderCoffee(whom1, coffee1));
     testKit.run(new Barista.OrderCoffee(whom2, coffee2));
-    List<CapturedLogEvent> allLogEntries = testKit.getAllLogEntries();
+    final var allLogEntries = testKit.getAllLogEntries();
 
     Map<String, Coffee> expectedOrders = new HashMap<>();
     expectedOrders.put(whom1, coffee1);
@@ -46,44 +46,50 @@ public class BaristaTests {
   // Barista should spawn a child actor CoffeeMachine with as actor name 'coffee-machine'
   @Test
   public void spawnCoffeeMachineChild() {
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var effects = testKit.getAllEffects();
 
-    var effects = testKit.getAllEffects();
+    final var spawnEffectOpt =
+        effects.stream()
+            // .filter( e -> e instanceof Effect.Spawned)
+            .filter(Effect.Spawned.class::isInstance)
+            .map(Effect.Spawned.class::cast)
+            .findFirst();
 
-    var spawnEffectOpt = effects.stream().filter(e -> e instanceof Effect.Spawned).findFirst();
-
-    spawnEffectOpt.ifPresent(
-        effect -> {
-          var spawnEffect = (Effect.Spawned) effect;
-          assertEquals("coffee-machine", spawnEffect.childName());
-        });
+    /*
+     NOTE: Move `Effect.Spawned` casting to the precedent lines
+     spawnEffectOpt.ifPresent((effect) -> {
+       var spawnedEffect = (Effect.Spawned) effect;
+       assertEquals("coffee-machine", spawnedEffect.childName());
+     });
+    */
+    spawnEffectOpt.ifPresent(effect -> assertEquals("coffee-machine", effect.childName()));
   }
 
   @Test
   public void baristaShouldCreateMessageAdapter() {
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
+    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var effects = testKit.getAllEffects();
 
-    var effects = testKit.getAllEffects();
-
-    assertTrue(effects.stream().anyMatch(o -> o instanceof Effect.MessageAdapter));
+    // assertTrue(effects.stream().anyMatch(o -> o instanceof Effect.MessageAdapter));
+    assertTrue(effects.stream().anyMatch(Effect.MessageAdapter.class::isInstance));
   }
 
   @Test
   public void baristaShouldSendRequest() {
-    var whom = "Ben";
-    var coffee = new Coffee.Akkaccino();
-
-    BehaviorTestKit<Barista.BaristaCommand> testKit = BehaviorTestKit.create(Barista.create());
-    TestInbox<CoffeeMachine.CoffeeMachineCommand> coffeeMachineInbox =
-        testKit.childInbox("coffee-machine");
+    final var whom = "Ben";
+    final var coffee = new Coffee.Akkaccino();
+    final var testKit = BehaviorTestKit.create(Barista.create());
+    final var coffeeMachineInbox =
+        testKit.<CoffeeMachine.CoffeeMachineCommand>childInbox("coffee-machine");
 
     testKit.run(new Barista.OrderCoffee(whom, coffee));
 
-    var messages = coffeeMachineInbox.getAllReceived();
+    final var messages = coffeeMachineInbox.getAllReceived();
 
     assertEquals(1, messages.size());
 
-    CoffeeMachine.BrewCoffee brewCoffee = (CoffeeMachine.BrewCoffee) messages.get(0);
+    final var brewCoffee = (CoffeeMachine.BrewCoffee) messages.getFirst();
 
     assertEquals(brewCoffee.coffee, coffee);
     // message adapters have deterministic anonymous names, in the same way as a regular child
