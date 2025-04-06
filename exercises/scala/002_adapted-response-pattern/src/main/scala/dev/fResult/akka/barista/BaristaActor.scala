@@ -21,12 +21,9 @@ object BaristaActor:
                             ): Behavior[BaristaCommand] = Behaviors.receiveMessage {
 
     case cmd@OrderCoffee(whom, coffee) =>
-//      val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
-
       onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-    case CoffeeReady(coffee) =>
-//      val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
 
+    case CoffeeReady(coffee) =>
       onCoffeeReady(context, coffeeMachineActorRef, state)
   }
 
