@@ -39,6 +39,7 @@ object BaristaActor:
                             context: ActorContext[BaristaCommand],
                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand]
                            ): Behavior[BaristaCommand] = {
+
     coffeeMachineActorRef ! PickupCoffee(coffee)
 
     Behaviors.same

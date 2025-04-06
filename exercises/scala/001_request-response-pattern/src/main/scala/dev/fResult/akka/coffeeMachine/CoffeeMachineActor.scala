@@ -30,6 +30,11 @@ object CoffeeMachineActor:
 
     command.replyTo ! CoffeeReady(coffee)
 
+    coffeeReady(context, command)
+  }
+
+  private def coffeeReady(context: ActorContext[CoffeeMachineCommand], command: BrewCoffee): Behavior[CoffeeMachineCommand] = {
+    val coffee = command.coffee
     context.log.info("CoffeeMachine: Coffee {} is ready", coffee)
 
     Behaviors.receiveMessage {
