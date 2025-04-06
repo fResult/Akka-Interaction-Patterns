@@ -2,7 +2,7 @@ package dev.fResult.akka
 
 import akka.actor.typed.ActorSystem
 import dev.fResult.akka.barista.BaristaCommand.OrderCoffee
-import dev.fResult.akka.Coffee.{Akkacino, CaffeeJava}
+import dev.fResult.akka.Coffee.{Akkacino, CaffeJava}
 import dev.fResult.akka.barista.BaristaActor
 
 import java.io.IOException
@@ -15,7 +15,7 @@ def main(): Unit = {
 
   println("hello ex1")
   baristaActor ! OrderCoffee("Wick", Akkacino)
-  baristaActor ! OrderCoffee("Anderson", CaffeeJava)
+  baristaActor ! OrderCoffee("Anderson", CaffeJava)
 
   println(">>> Press ENTER to exit <<<")
   readLine()
