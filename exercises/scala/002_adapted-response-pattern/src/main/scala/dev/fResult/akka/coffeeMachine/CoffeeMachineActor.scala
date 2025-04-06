@@ -2,10 +2,15 @@ package dev.fResult.akka.coffeeMachine
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
+import dev.fResult.akka.coffeeMachine.CoffeeMachineCommand.BrewCoffee
 
 object CoffeeMachineActor {
-  def apply(): Behavior[CoffeeMachineCommand] = {
-    println("Coffee Machine Actor is worked")
-    Behaviors.same
+  def apply(): Behavior[CoffeeMachineCommand] = Behaviors.setup { context =>
+    context.log.info("CoffeeMachine: IDLE")
+
+    Behaviors.receiveMessage {
+      case BrewCoffee(coffee, _) => Behaviors.same
+      case _ => Behaviors.same
+    }
   }
 }
