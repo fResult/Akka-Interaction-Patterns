@@ -3,15 +3,29 @@ package dev.fResult.akka
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
 
-object BaristaActor {
-  def apply(): Behavior[String] = Behaviors.setup(BaristaBehavior(_))
+import scala.collection.mutable
 
-  private class BaristaBehavior(context: ActorContext[String]) extends AbstractBehavior[String](context) {
+object BaristaActor:
+  def apply(): Behavior[OrderCoffee] = Behaviors.setup(BaristaBehavior(_))
 
-    override def onMessage(message: String): Behavior[String] = {
-      println(s"Hello, $message!")
+  private def printOrder(orders: List[(String, Coffee)]): String = {
+    val formattedOrders = orders.map(order => s"${order._1}->${order._2}")
+        .reduce((acc, s) => s"$acc, $s")
+
+    s"[$formattedOrders]"
+  }
+
+  final case class OrderCoffee(whom: String, coffee: Coffee)
+
+  private class BaristaBehavior(context: ActorContext[OrderCoffee]) extends AbstractBehavior[OrderCoffee](context):
+    private val orders: mutable.Map[String, Coffee] = mutable.Map()
+
+    override def onMessage(message: OrderCoffee): Behavior[OrderCoffee] = {
+      orders.put(message.whom, message.coffee)
+
+      context.log.info(s"Orders: ${printOrder(orders.toList)}")
 
       Behaviors.same
     }
-  }
-}
+  end BaristaBehavior
+end BaristaActor
