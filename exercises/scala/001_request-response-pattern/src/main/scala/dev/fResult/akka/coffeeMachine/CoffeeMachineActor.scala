@@ -16,7 +16,7 @@ object CoffeeMachineActor:
 
     Behaviors.receiveMessage {
       case command@BrewCoffee(coffee, replyTo) => onBrewCoffee(context, command)
-      case _ => Behaviors.same
+      case PickupCoffee => Behaviors.same
     }
   }
 
@@ -38,7 +38,7 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: Coffee {} is ready", coffee)
 
     Behaviors.receiveMessage {
-      case command@BrewCoffee(c, _) => onBrewCoffee(context, command)
+      case command@BrewCoffee(_, _) => onBrewCoffee(context, command)
       case PickupCoffee => onPickupCoffee(context, coffee)
     }
   }
