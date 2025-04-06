@@ -10,13 +10,19 @@ object BaristaActor {
 
   final case class OrderCoffee(whom: String, coffee: Coffee)
 
+  private def printOrder(orderSet: Set[(String, Coffee)]): String = {
+    val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
+
+    s"[${formattedOrders.mkString(", ")}]"
+  }
+
   private final class BaristaBehavior(context: ActorContext[OrderCoffee]) extends AbstractBehavior[OrderCoffee](context):
     private val orders = mutable.Map[String, Coffee]()
 
     override def onMessage(command: OrderCoffee): Behavior[OrderCoffee] = {
       orders.put(command.whom, command.coffee)
 
-      context.log.info(s"Greet, $command")
+      context.log.info(s"Orders: ${printOrder(orders.toSet)}")
 
       Behaviors.same
     }
