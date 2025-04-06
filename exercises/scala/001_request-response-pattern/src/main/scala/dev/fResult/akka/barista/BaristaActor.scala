@@ -13,21 +13,21 @@ object BaristaActor:
   def apply(): Behavior[BaristaCommand] = Behaviors.setup(context => {
     val coffeeMachineActorRef = context.spawn(CoffeeMachineActor(), "coffee-machine")
 
-    handleCommands(context, State())
+    handleCommands(context, coffeeMachineActorRef, State())
   })
 
   private def onOrderCoffee(command: OrderCoffee,
                             context: ActorContext[BaristaCommand],
-                            coffeeMachineActor: ActorRef[CoffeeMachineCommand],
+                            coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
                             state: State
                            ): Behavior[BaristaCommand] = {
 
     val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
     context.log.info(s"Barista: Orders${printOrder(updatedState.orders.toSet)}")
 
-    coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
+    coffeeMachineActorRef ! BrewCoffee(command.coffee, context.self)
 
-    handleCommands(context, updatedState)
+    handleCommands(context, coffeeMachineActorRef, updatedState)
   }
 
   private def onCoffeeReady(context: ActorContext[BaristaCommand],
@@ -37,27 +37,20 @@ object BaristaActor:
 
     coffeeMachineActorRef ! PickupCoffee
 
-    handleCommands(context, state)
+    handleCommands(context, coffeeMachineActorRef, state)
   }
 
   private def handleCommands(context: ActorContext[BaristaCommand],
+                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
                              state: State
                             ): Behavior[BaristaCommand] = Behaviors.receiveMessage {
 
     case command@OrderCoffee(whom, coffee) =>
-      val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
-
       onOrderCoffee(command, context, coffeeMachineActorRef, state)
 
     case CoffeeReady(coffee) =>
-      val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
-
       onCoffeeReady(context, coffeeMachineActorRef, state)
   }
-
-  private def childCoffeeMachineActorRef(context: ActorContext[BaristaCommand]): ActorRef[CoffeeMachineCommand] =
-    context.child("coffee-machine").getOrElse(context.spawn(CoffeeMachineActor(), "coffee-machine"))
-        .asInstanceOf[ActorRef[CoffeeMachineCommand]]
 
   private def printOrder(orderSet: Set[(String, Coffee)]): String = {
     val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
