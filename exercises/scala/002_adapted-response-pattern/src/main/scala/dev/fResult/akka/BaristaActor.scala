@@ -8,8 +8,8 @@ import scala.collection.mutable
 object BaristaActor:
   def apply(): Behavior[OrderCoffee] = Behaviors.setup(BaristaBehavior(_))
 
-  private def printOrder(orders: List[(String, Coffee)]): String = {
-    val formattedOrders = orders.map(order => s"${order._1}->${order._2}")
+  private def printOrder(orderSet: Set[(String, Coffee)]): String = {
+    val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
 
     s"[${formattedOrders.mkString(", ")}]"
   }
@@ -22,7 +22,7 @@ object BaristaActor:
     override def onMessage(message: OrderCoffee): Behavior[OrderCoffee] = {
       orders.put(message.whom, message.coffee)
 
-      context.log.info(s"Orders: ${printOrder(orders.toList)}")
+      context.log.info(s"Orders: ${printOrder(orders.toSet)}")
 
       Behaviors.same
     }
