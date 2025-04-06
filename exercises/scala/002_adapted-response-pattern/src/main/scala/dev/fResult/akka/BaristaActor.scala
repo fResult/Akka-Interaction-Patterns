@@ -10,9 +10,8 @@ object BaristaActor:
 
   private def printOrder(orders: List[(String, Coffee)]): String = {
     val formattedOrders = orders.map(order => s"${order._1}->${order._2}")
-        .reduce((acc, s) => s"$acc, $s")
 
-    s"[$formattedOrders]"
+    s"[${formattedOrders.mkString(", ")}]"
   }
 
   final case class OrderCoffee(whom: String, coffee: Coffee)
