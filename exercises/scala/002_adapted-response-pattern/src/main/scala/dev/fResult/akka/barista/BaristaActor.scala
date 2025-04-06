@@ -1,7 +1,8 @@
-package dev.fResult.akka
+package dev.fResult.akka.barista
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
+import dev.fResult.akka.Coffee
 
 import scala.collection.mutable
 
