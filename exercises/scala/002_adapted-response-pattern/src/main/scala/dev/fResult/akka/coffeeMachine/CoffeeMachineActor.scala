@@ -1,4 +1,4 @@
-package dev.fResult.akka
+package dev.fResult.akka.coffeeMachine
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors

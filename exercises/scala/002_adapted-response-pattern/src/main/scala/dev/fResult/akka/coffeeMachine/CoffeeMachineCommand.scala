@@ -1,6 +1,7 @@
-package dev.fResult.akka
+package dev.fResult.akka.coffeeMachine
 
 import akka.actor.typed.ActorRef
+import dev.fResult.akka.Coffee
 import dev.fResult.akka.barista.BaristaCommand
 
 enum CoffeeMachineCommand {
