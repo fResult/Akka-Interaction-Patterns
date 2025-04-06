@@ -1,7 +1,6 @@
 package dev.fResult.akka
 
-import akka.actor.typed.scaladsl.{AbstractBehavior, ActorContext, Behaviors}
-import akka.actor.typed.{ActorSystem, Behavior}
+import akka.actor.typed.ActorSystem
 
 import java.io.IOException
 import scala.io.StdIn.readLine
@@ -19,15 +18,4 @@ def main(): Unit = {
   Exception.ignoring(classOf[IOException])
 
   baristaActor.terminate()
-}
-
-object BaristaActor {
-  def apply(): Behavior[Any] = Behaviors.setup(BaristaBehavior(_))
-
-  private final class BaristaBehavior(context: ActorContext[Any]) extends AbstractBehavior[Any](context):
-    override def onMessage(msg: Any): Behavior[Any] = {
-      println(s"Greet, $msg")
-
-      Behaviors.same
-    }
 }
