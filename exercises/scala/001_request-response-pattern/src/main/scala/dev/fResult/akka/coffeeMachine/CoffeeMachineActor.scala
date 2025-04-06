@@ -15,7 +15,7 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: IDLE")
 
     Behaviors.receiveMessage {
-      case BrewCoffee(coffee, replyTo) => onBrewCoffee(context, BrewCoffee(coffee, replyTo))
+      case command@BrewCoffee(coffee, replyTo) => onBrewCoffee(context, command)
       case _ => Behaviors.same
     }
   }
@@ -31,17 +31,16 @@ object CoffeeMachineActor:
 
     command.replyTo ! CoffeeReady(coffee)
 
-    coffeeReady(context, command)
+    coffeeReady(context, command.coffee)
   }
 
-  private def coffeeReady(context: ActorContext[CoffeeMachineCommand], command: BrewCoffee): Behavior[CoffeeMachineCommand] = {
-    val coffee = command.coffee
+  private def coffeeReady(context: ActorContext[CoffeeMachineCommand], coffee: Coffee): Behavior[CoffeeMachineCommand] = {
     context.log.info("CoffeeMachine: Coffee {} is ready", coffee)
 
-    Behaviors.setup(context => Behaviors.receiveMessage {
-      case BrewCoffee(c, _) => onBrewCoffee(context, command)
+    Behaviors.receiveMessage {
+      case command@BrewCoffee(c, _) => onBrewCoffee(context, command)
       case PickupCoffee => onPickupCoffee(context, coffee)
-    })
+    }
   }
 
   private def onPickupCoffee(context: ActorContext[CoffeeMachineCommand], coffee: Coffee): Behavior[CoffeeMachineCommand] = {

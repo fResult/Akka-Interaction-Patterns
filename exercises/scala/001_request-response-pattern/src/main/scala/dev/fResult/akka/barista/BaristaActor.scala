@@ -43,10 +43,10 @@ object BaristaActor:
                              state: State
                             ): Behavior[BaristaCommand] = Behaviors.receiveMessage {
 
-    case OrderCoffee(whom, coffee) =>
+    case command@OrderCoffee(whom, coffee) =>
       val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
 
-      onOrderCoffee(OrderCoffee(whom, coffee), context, coffeeMachineActorRef, state)
+      onOrderCoffee(command, context, coffeeMachineActorRef, state)
 
     case CoffeeReady(coffee) =>
       val coffeeMachineActorRef = childCoffeeMachineActorRef(context)
