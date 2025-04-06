@@ -1,7 +1,7 @@
 package dev.fResult.akka
 
 import akka.actor.typed.ActorSystem
-import dev.fResult.akka.BaristaActor.OrderCoffee
+import dev.fResult.akka.BaristaCommand.OrderCoffee
 import dev.fResult.akka.Coffee.{Akkacino, CaffeeJava}
 
 import java.io.IOException
@@ -12,6 +12,7 @@ import scala.util.control.Exception
 def main(): Unit = {
   val baristaActor = ActorSystem(BaristaActor(), "barista")
 
+  println("hello ex1")
   baristaActor ! OrderCoffee("Wick", Akkacino)
   baristaActor ! OrderCoffee("Anderson", CaffeeJava)
 
