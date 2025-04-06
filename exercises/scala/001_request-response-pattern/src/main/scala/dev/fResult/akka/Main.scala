@@ -1,7 +1,7 @@
 package dev.fResult.akka
 
 import akka.actor.typed.ActorSystem
-import dev.fResult.akka.BaristaCommand.OrderCoffee
+import BaristaCommand.OrderCoffee
 import dev.fResult.akka.Coffee.{Akkacino, CaffeeJava}
 
 import java.io.IOException
