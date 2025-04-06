@@ -13,7 +13,6 @@ import scala.util.control.Exception
 def main(): Unit = {
   val baristaActor = ActorSystem(BaristaActor(), "barista")
 
-  println("hello ex1")
   baristaActor ! OrderCoffee("Wick", Akkacino)
   baristaActor ! OrderCoffee("Anderson", CaffeJava)
 
