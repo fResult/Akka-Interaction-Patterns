@@ -1,10 +1,11 @@
-package dev.fResult.akka
+package dev.fResult.akka.barista
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
-import dev.fResult.akka.BaristaCommand.OrderCoffee
-import dev.fResult.akka.CoffeeMachineCommand.BrewCoffee
-import dev.fResult.akka.{Coffee, CoffeeMachineActor, CoffeeMachineCommand}
+import dev.fResult.akka.Coffee
+import dev.fResult.akka.barista.BaristaCommand.OrderCoffee
+import dev.fResult.akka.coffeeMachine.CoffeeMachineCommand.BrewCoffee
+import dev.fResult.akka.coffeeMachine.{CoffeeMachineActor, CoffeeMachineCommand}
 
 import scala.collection.mutable
 

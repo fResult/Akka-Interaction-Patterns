@@ -1,4 +1,4 @@
-package dev.fResult.akka
+package dev.fResult.akka.coffeeMachine
 
 import dev.fResult.akka.Coffee
 

@@ -1,9 +1,9 @@
-package dev.fResult.akka
+package dev.fResult.akka.coffeeMachine
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import dev.fResult.akka.Coffee
-import CoffeeMachineCommand.BrewCoffee
+import dev.fResult.akka.coffeeMachine.CoffeeMachineCommand.BrewCoffee
 
 import scala.util.{Failure, Try}
 
