@@ -2,6 +2,7 @@ package dev.fResult.akka.coffeeMachine
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
+import dev.fResult.akka.Coffee
 import dev.fResult.akka.barista.BaristaCommand.CoffeeReady
 import dev.fResult.akka.coffeeMachine.CoffeeMachineCommand.{BrewCoffee, PickupCoffee}
 
@@ -37,9 +38,14 @@ object CoffeeMachineActor:
     val coffee = command.coffee
     context.log.info("CoffeeMachine: Coffee {} is ready", coffee)
 
-    Behaviors.receiveMessage {
-      case PickupCoffee(_) => context.log.info(s"CoffeeMachine: Coffee $coffee is picked up"); idle()
+    Behaviors.setup(context => Behaviors.receiveMessage {
       case BrewCoffee(c, _) => onBrewCoffee(context, command)
-    }
+      case PickupCoffee => onPickupCoffee(context, coffee)
+    })
+  }
+
+  private def onPickupCoffee(context: ActorContext[CoffeeMachineCommand], coffee: Coffee): Behavior[CoffeeMachineCommand] = {
+    context.log.info(s"CoffeeMachine: Coffee $coffee is picked up")
+    idle()
   }
 end CoffeeMachineActor

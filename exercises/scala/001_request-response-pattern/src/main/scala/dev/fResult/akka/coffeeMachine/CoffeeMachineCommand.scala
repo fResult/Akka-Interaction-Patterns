@@ -6,5 +6,5 @@ import dev.fResult.akka.barista.BaristaCommand
 
 enum CoffeeMachineCommand {
   case BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand])
-  case PickupCoffee(coffee: Coffee)
+  case PickupCoffee
 }
