@@ -15,7 +15,7 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: IDLE")
 
     Behaviors.receiveMessage {
-      case command@BrewCoffee(coffee, replyTo) => onBrewCoffee(context, command)
+      case command@BrewCoffee(_, _) => onBrewCoffee(context, command)
       case PickupCoffee => Behaviors.same
     }
   }
