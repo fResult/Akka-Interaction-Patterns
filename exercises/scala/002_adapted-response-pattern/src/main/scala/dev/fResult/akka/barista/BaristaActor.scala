@@ -11,21 +11,9 @@ object BaristaActor:
   private final case class State(orders: Map[String, Coffee] = Map.empty)
 
   def apply(): Behavior[BaristaCommand] = Behaviors.setup { context =>
-    val coffeeMachineActorRef = spawnCoffeeMachineActor(context)
+    val coffeeMachineActorRef = context.spawn(CoffeeMachineActor(), "coffee-machine")
 
     handleCommands(context, coffeeMachineActorRef, State())
-  }
-
-  private def handleCommands(context: ActorContext[BaristaCommand],
-                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
-                             state: State,
-                            ): Behavior[BaristaCommand] = Behaviors.receiveMessage {
-
-    case cmd@OrderCoffee(whom, coffee) =>
-      onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-
-    case CoffeeReady(coffee) =>
-      onCoffeeReady(context, coffeeMachineActorRef, state)
   }
 
   private def onOrderCoffee(command: OrderCoffee,
@@ -50,8 +38,17 @@ object BaristaActor:
     handleCommands(context, coffeeMachineActorRef, state)
   }
 
-  private def spawnCoffeeMachineActor(context: ActorContext[BaristaCommand]): ActorRef[CoffeeMachineCommand] =
-    context.spawn(CoffeeMachineActor(), "coffee-machine")
+  private def handleCommands(context: ActorContext[BaristaCommand],
+                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
+                             state: State,
+                            ): Behavior[BaristaCommand] = Behaviors.receiveMessage {
+
+    case cmd@OrderCoffee(whom, coffee) =>
+      onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
+
+    case CoffeeReady(coffee) =>
+      onCoffeeReady(context, coffeeMachineActorRef, state)
+  }
 
   private def printOrder(orderSet: Set[(String, Coffee)]): String = {
     val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
