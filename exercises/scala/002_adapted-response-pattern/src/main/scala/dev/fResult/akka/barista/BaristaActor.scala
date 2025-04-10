@@ -35,7 +35,7 @@ object BaristaActor:
                            ): Behavior[BaristaCommand] = {
 
     val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
-    context.log.info(s"Barista: Orders${printOrder(state.orders.toSet)}")
+    context.log.info(s"Barista: Orders${printOrder(updatedState.orders.toSet)}")
 
     coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
     handleCommands(context, coffeeMachineActor, updatedState)
