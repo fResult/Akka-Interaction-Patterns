@@ -4,6 +4,7 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, Behavior}
 import dev.fResult.akka.Coffee
 import dev.fResult.akka.barista.BaristaCommand.{CoffeeReady, OrderCoffee}
+import dev.fResult.akka.coffeeMachine.CoffeeMachineCommand.{BrewCoffee, PickupCoffee}
 import dev.fResult.akka.coffeeMachine.{CoffeeMachineActor, CoffeeMachineCommand}
 
 object BaristaActor:
@@ -34,8 +35,9 @@ object BaristaActor:
                            ): Behavior[BaristaCommand] = {
 
     val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
+    context.log.info(s"Barista: Orders${printOrder(state.orders.toSet)}")
 
-    // TODO: Send BrewCoffee command to CoffeeMachineActor
+    coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
     handleCommands(context, coffeeMachineActor, updatedState)
   }
 
@@ -44,7 +46,7 @@ object BaristaActor:
                             state: State,
                            ): Behavior[BaristaCommand] = {
 
-    // TODO: Send PickupCoffee command to CoffeeMachineActor
+    coffeeMachineActorRef ! PickupCoffee
     handleCommands(context, coffeeMachineActorRef, state)
   }
 
