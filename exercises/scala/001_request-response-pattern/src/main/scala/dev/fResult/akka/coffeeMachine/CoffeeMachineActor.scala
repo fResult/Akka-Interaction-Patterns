@@ -44,7 +44,7 @@ object CoffeeMachineActor:
   }
 
   private def onPickupCoffee(context: ActorContext[CoffeeMachineCommand], coffee: Coffee): Behavior[CoffeeMachineCommand] = {
-    context.log.info(s"CoffeeMachine: Coffee $coffee is picked up")
+    context.log.info(s"CoffeeMachine: Picking up $coffee")
     idle()
   }
 end CoffeeMachineActor

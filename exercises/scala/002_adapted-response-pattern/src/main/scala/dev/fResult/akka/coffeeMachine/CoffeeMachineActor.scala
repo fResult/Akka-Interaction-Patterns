@@ -25,7 +25,7 @@ object CoffeeMachineActor {
                           ): Behavior[CoffeeMachineCommand] =
 
     val coffee = command.coffee;
-    context.log.info(s"CoffeeMachine: Coffee $coffee is brewing")
+    context.log.info(s"CoffeeMachine: Brewing 1 $coffee")
 
     Try(Thread.sleep(3000)) match
       case Failure(ex: InterruptedException) => ex.printStackTrace()
@@ -41,6 +41,6 @@ object CoffeeMachineActor {
 
   private def onPickupCoffee(context: ActorContext[CoffeeMachineCommand], coffee: Coffee) =
     // TODO: Update following the exercise 2, using MessageAdapter
-    context.log.info(s"CoffeeCommand: Coffee $coffee is picking up")
+    context.log.info(s"CoffeeCommand: Picking up $coffee")
     idle()
 }
