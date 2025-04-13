@@ -4,6 +4,7 @@ import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
 import akka.actor.testkit.typed.javadsl.TestProbe;
 import akka.actor.typed.ActorRef;
+import com.akka.training.coffeeMachine.CoffeeMachineActor;
 import java.time.Duration;
 import org.junit.ClassRule;
 import org.junit.Test;

@@ -1,9 +1,10 @@
-package com.akka.training;
+package com.akka.training.coffeeMachine;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
+import com.akka.training.Coffee;
 
 public class CoffeeMachineActor {
   private static final int BREWING_DURATION_SECONDS = 10;

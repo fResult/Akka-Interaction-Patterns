@@ -1,6 +1,7 @@
 package com.akka.training;
 
 import akka.actor.typed.ActorSystem;
+import com.akka.training.barista.BaristaActor;
 import java.io.IOException;
 
 public class Main {

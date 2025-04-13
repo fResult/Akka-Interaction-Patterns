@@ -1,4 +1,4 @@
-package com.akka.training;
+package com.akka.training.barista;
 
 import akka.actor.typed.ActorRef;
 import akka.actor.typed.Behavior;
@@ -6,6 +6,8 @@ import akka.actor.typed.javadsl.AbstractBehavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
+import com.akka.training.Coffee;
+import com.akka.training.coffeeMachine.CoffeeMachineActor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

@@ -7,6 +7,8 @@ import akka.actor.testkit.typed.CapturedLogEvent;
 import akka.actor.testkit.typed.Effect;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
 import akka.actor.testkit.typed.javadsl.TestInbox;
+import com.akka.training.barista.BaristaActor;
+import com.akka.training.coffeeMachine.CoffeeMachineActor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
