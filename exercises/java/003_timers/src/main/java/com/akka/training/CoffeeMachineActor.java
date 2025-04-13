@@ -5,11 +5,11 @@ import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
 
-public class CoffeeMachine {
+public class CoffeeMachineActor {
   private static final int BREWING_DURATION_SECONDS = 10;
 
   public static Behavior<CoffeeMachineCommand> create() {
-    return Behaviors.setup(CoffeeMachine::idle);
+    return Behaviors.setup(CoffeeMachineActor::idle);
   }
 
   private static Behavior<CoffeeMachineCommand> idle(
@@ -54,19 +54,19 @@ public class CoffeeMachine {
   public interface CoffeeMachineCommand {}
 
   public static final class BrewCoffee implements CoffeeMachineCommand {
-    public final Coffee coffee;
+    public final CoffeeCommand coffee;
     public final ActorRef<CoffeeIsReady> replyTo;
 
-    public BrewCoffee(Coffee coffee, ActorRef<CoffeeIsReady> replyTo) {
+    public BrewCoffee(CoffeeCommand coffee, ActorRef<CoffeeIsReady> replyTo) {
       this.coffee = coffee;
       this.replyTo = replyTo;
     }
   }
 
   public static final class CoffeeIsReady implements CoffeeMachineCommand {
-    public final Coffee coffee;
+    public final CoffeeCommand coffee;
 
-    public CoffeeIsReady(Coffee coffee) {
+    public CoffeeIsReady(CoffeeCommand coffee) {
       this.coffee = coffee;
     }
   }

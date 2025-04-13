@@ -1,4 +1,4 @@
-package com.lightbend.training;
+package com.akka.training;
 
 import akka.actor.testkit.typed.CapturedLogEvent;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;

@@ -2,8 +2,8 @@ package com.akka.training;
 
 import java.io.Serializable;
 
-public interface Coffee extends Serializable {
-  final class Akkaccino implements Coffee {
+public interface CoffeeCommand extends Serializable {
+  final class Akkaccino implements CoffeeCommand {
     @Override
     public String toString() {
       return this.getClass().getSimpleName();
@@ -15,7 +15,7 @@ public interface Coffee extends Serializable {
     }
   }
 
-  final class CaffeJava implements Coffee {
+  final class CaffeJava implements CoffeeCommand {
     @Override
     public String toString() {
       return this.getClass().getSimpleName();
@@ -27,7 +27,7 @@ public interface Coffee extends Serializable {
     }
   }
 
-  final class MochaPlay implements Coffee {
+  final class MochaPlay implements CoffeeCommand {
     @Override
     public String toString() {
       return this.getClass().getSimpleName();

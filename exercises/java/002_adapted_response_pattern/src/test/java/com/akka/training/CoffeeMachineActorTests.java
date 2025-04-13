@@ -1,12 +1,10 @@
-package com.lightbend.training;
+package com.akka.training;
 
-import static com.lightbend.training.TestsUtils.*;
+import static com.akka.training.TestsUtils.*;
 import static org.junit.Assert.assertEquals;
 
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
 import akka.actor.testkit.typed.javadsl.TestInbox;
-import com.akka.training.Coffee;
-import com.akka.training.CoffeeMachineActor;
 import org.junit.Test;
 
 public class CoffeeMachineActorTests {

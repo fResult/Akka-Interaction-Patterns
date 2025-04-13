@@ -1,4 +1,4 @@
-package com.lightbend.training;
+package com.akka.training;
 
 import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;

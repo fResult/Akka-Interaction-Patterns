@@ -1,4 +1,4 @@
-package com.lightbend.training;
+package com.akka.training;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,9 +6,7 @@ import static org.junit.Assert.assertTrue;
 import akka.actor.testkit.typed.CapturedLogEvent;
 import akka.actor.testkit.typed.Effect;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
-import com.akka.training.BaristaActor;
-import com.akka.training.Coffee;
-import com.akka.training.CoffeeMachineActor;
+
 import java.util.HashMap;
 import org.junit.Test;
 
