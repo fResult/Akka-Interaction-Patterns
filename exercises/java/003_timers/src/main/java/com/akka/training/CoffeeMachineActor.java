@@ -25,13 +25,13 @@ public class CoffeeMachineActor {
   }
 
   private static Behavior<CoffeeMachineCommand> brewing(
-      final ActorContext<CoffeeMachineCommand> context, BrewCoffee brewingCoffee) {
+      final ActorContext<CoffeeMachineCommand> context, BrewCoffee command) {
 
-    context.getLog().info("CoffeeMachine: Brewing 1 {}", brewingCoffee.coffee.toString());
+    context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee.toString());
 
     // TODO Implement the brewing duration (10 seconds) WITHOUT using Thread.sleep
     // (Currently the brewing is immediate, CoffeeIsReady is immediately sent to the Barista)
-    brewingCoffee.replyTo.tell(new CoffeeIsReady(brewingCoffee.coffee));
+    command.replyTo.tell(new CoffeeIsReady(command.coffee));
 
     return coffeeReady(context);
   }
@@ -54,19 +54,19 @@ public class CoffeeMachineActor {
   public interface CoffeeMachineCommand {}
 
   public static final class BrewCoffee implements CoffeeMachineCommand {
-    public final CoffeeCommand coffee;
+    public final Coffee coffee;
     public final ActorRef<CoffeeIsReady> replyTo;
 
-    public BrewCoffee(CoffeeCommand coffee, ActorRef<CoffeeIsReady> replyTo) {
+    public BrewCoffee(Coffee coffee, ActorRef<CoffeeIsReady> replyTo) {
       this.coffee = coffee;
       this.replyTo = replyTo;
     }
   }
 
   public static final class CoffeeIsReady implements CoffeeMachineCommand {
-    public final CoffeeCommand coffee;
+    public final Coffee coffee;
 
-    public CoffeeIsReady(CoffeeCommand coffee) {
+    public CoffeeIsReady(Coffee coffee) {
       this.coffee = coffee;
     }
   }

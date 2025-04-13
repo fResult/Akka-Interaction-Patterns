@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> {
   // Orders <Whom, Coffee>
-  private final Map<String, CoffeeCommand> orders = new HashMap<>();
+  private final Map<String, Coffee> orders = new HashMap<>();
   // reference to the coffee-machine child actor, allowing to send messages to coffee machine
   private final ActorRef<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachine;
   private final ActorRef<CoffeeMachineActor.CoffeeIsReady> coffeeMachineMessageAdapter;
@@ -35,7 +35,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
   }
 
   // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
-  static String printOrders(Set<Map.Entry<String, CoffeeCommand>> orders) {
+  static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
     return orders.stream()
         .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
         .reduce((acc, s) -> acc + "," + s)
@@ -55,7 +55,8 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
     orders.put(command.whom, command.coffee);
     getContext().getLog().info("Orders:{}", printOrders(orders.entrySet()));
 
-    coffeeMachine.tell(new CoffeeMachineActor.BrewCoffee(command.coffee, coffeeMachineMessageAdapter));
+    coffeeMachine.tell(
+        new CoffeeMachineActor.BrewCoffee(command.coffee, coffeeMachineMessageAdapter));
 
     return this;
   }
@@ -75,9 +76,9 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
   public static final class OrderCoffee implements BaristaCommand {
     public final String whom;
-    public final CoffeeCommand coffee;
+    public final Coffee coffee;
 
-    public OrderCoffee(String whom, CoffeeCommand coffee) {
+    public OrderCoffee(String whom, Coffee coffee) {
       this.whom = whom;
       this.coffee = coffee;
     }

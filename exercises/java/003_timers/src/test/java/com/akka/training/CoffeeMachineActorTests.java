@@ -19,7 +19,7 @@ public class CoffeeMachineActorTests {
     ActorRef<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachine =
         testKit.spawn(CoffeeMachineActor.create(), "coffee-machine-brewing");
     TestProbe<CoffeeMachineActor.CoffeeIsReady> probe = testKit.createTestProbe();
-    var coffee = new CoffeeCommand.Akkaccino();
+    var coffee = new Coffee.Akkaccino();
     LoggingTestKit.info("CoffeeMachine: Brewing 1 " + coffee)
         .withOccurrences(1)
         .expect(
@@ -38,7 +38,8 @@ public class CoffeeMachineActorTests {
         testKit.spawn(CoffeeMachineActor.create(), "coffee-machine-shouldSendReadySignalToBarista");
     TestProbe<CoffeeMachineActor.CoffeeIsReady> probe = testKit.createTestProbe();
 
-    coffeeMachine.tell(new CoffeeMachineActor.BrewCoffee(new CoffeeCommand.Akkaccino(), probe.getRef()));
+    coffeeMachine.tell(
+        new CoffeeMachineActor.BrewCoffee(new Coffee.Akkaccino(), probe.getRef()));
 
     probe.expectNoMessage(Duration.ofMillis(BREWING_DURATION_Millis - 100));
     probe.expectMessageClass(
@@ -56,13 +57,15 @@ public class CoffeeMachineActorTests {
         testKit.spawn(CoffeeMachineActor.create(), "coffee-machine-restartCycle");
     TestProbe<CoffeeMachineActor.CoffeeIsReady> probe = testKit.createTestProbe();
 
-    coffeeMachine.tell(new CoffeeMachineActor.BrewCoffee(new CoffeeCommand.Akkaccino(), probe.getRef()));
+    coffeeMachine.tell(
+        new CoffeeMachineActor.BrewCoffee(new Coffee.Akkaccino(), probe.getRef()));
     probe.expectNoMessage(Duration.ofMillis(BREWING_DURATION_Millis - 100));
     probe.expectMessageClass(
         CoffeeMachineActor.CoffeeIsReady.class, Duration.ofMillis(BREWING_DURATION_Millis + 100));
     coffeeMachine.tell(new CoffeeMachineActor.PickupCoffee());
 
-    coffeeMachine.tell(new CoffeeMachineActor.BrewCoffee(new CoffeeCommand.MochaPlay(), probe.getRef()));
+    coffeeMachine.tell(
+        new CoffeeMachineActor.BrewCoffee(new Coffee.MochaPlay(), probe.getRef()));
     probe.expectNoMessage(Duration.ofMillis(BREWING_DURATION_Millis - 100));
     probe.expectMessageClass(
         CoffeeMachineActor.CoffeeIsReady.class, Duration.ofMillis(BREWING_DURATION_Millis + 100));
@@ -74,11 +77,12 @@ public class CoffeeMachineActorTests {
   // (First, Barista need to pickup the ready coffee to reset the machine to idle state)
   @Test
   public void shouldNotProcessCoffeesUntilReset() {
-    var coffee1 = new CoffeeCommand.MochaPlay();
-    var coffee2 = new CoffeeCommand.Akkaccino();
+    var coffee1 = new Coffee.MochaPlay();
+    var coffee2 = new Coffee.Akkaccino();
 
     ActorRef<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachine =
-        testKit.spawn(CoffeeMachineActor.create(), "coffee-machine-shouldNotProcessCoffeesUntilReset");
+        testKit.spawn(
+            CoffeeMachineActor.create(), "coffee-machine-shouldNotProcessCoffeesUntilReset");
     TestProbe<CoffeeMachineActor.CoffeeIsReady> probe = testKit.createTestProbe();
 
     coffeeMachine.tell(new CoffeeMachineActor.BrewCoffee(coffee1, probe.getRef()));
