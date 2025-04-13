@@ -47,12 +47,16 @@ sdk install sbt 1.10.11
 
 ### Java Exercises
 
+Using OO-Style
+
 1. [Request Response Pattern - Java](./exercises/java/001_request_response_pattern)
 2. [Adapted Response Pattern - Java](./exercises/java/002_adapted_response_pattern)
 3. [Timers - Java](./exercises/java/003_timers)
 
 ### Scala Exercises
 
-1. [Request Response Pattern - Scala](./exercises/scala/001_request_response_pattern)
-2. [Adapted Response Pattern - Scala](./exercises/scala/002_adapted_response_pattern)
+Using Functional-Style
+
+1. [Request Response Pattern - Scala](./exercises/scala/001_request-response-pattern)
+2. [Adapted Response Pattern - Scala](./exercises/scala/002_adapted-response-pattern)
 3. [Timers - Scala](./exercises/scala/003_timers)
