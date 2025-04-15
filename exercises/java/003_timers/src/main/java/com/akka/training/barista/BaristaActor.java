@@ -8,6 +8,7 @@ import akka.actor.typed.javadsl.Behaviors;
 import akka.actor.typed.javadsl.Receive;
 import com.akka.training.Coffee;
 import com.akka.training.coffeeMachine.CoffeeMachineActor;
+import com.akka.training.coffeeMachine.CoffeeMachineCommand;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +17,8 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
   // Orders <Whom, Coffee>
   private final Map<String, Coffee> orders = new HashMap<>();
   // reference to the coffee-machine child actor, allowing to send messages to coffee machine
-  private final ActorRef<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachine;
-  private final ActorRef<CoffeeMachineActor.CoffeeIsReady> coffeeMachineMessageAdapter;
+  private final ActorRef<CoffeeMachineCommand> coffeeMachine;
+  private final ActorRef<CoffeeMachineCommand.CoffeeReady> coffeeMachineMessageAdapter;
 
   private BaristaActor(ActorContext<BaristaCommand> context) {
     super(context);
@@ -29,7 +30,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
     coffeeMachineMessageAdapter =
         context.messageAdapter(
-            CoffeeMachineActor.CoffeeIsReady.class, WrappedCoffeeMachineCoffeeIsReady::new);
+            CoffeeMachineCommand.CoffeeReady.class, WrappedCoffeeMachineCoffeeIsReady::new);
   }
 
   public static Behavior<BaristaCommand> create() {
@@ -37,7 +38,7 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
   }
 
   // Format the orders into expected format [whom1->coffee1,whom2->coffee2]
-  static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
+  public static String printOrders(Set<Map.Entry<String, Coffee>> orders) {
     return orders.stream()
         .map(kv -> String.format("%s->%s", kv.getKey(), kv.getValue()))
         .reduce((acc, s) -> acc + "," + s)
@@ -55,42 +56,31 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
   private Behavior<BaristaCommand> onOrderCoffee(OrderCoffee command) {
     orders.put(command.whom, command.coffee);
+
     getContext().getLog().info("Orders:{}", printOrders(orders.entrySet()));
 
     coffeeMachine.tell(
-        new CoffeeMachineActor.BrewCoffee(command.coffee, coffeeMachineMessageAdapter));
+        new CoffeeMachineCommand.BrewCoffee(command.coffee, coffeeMachineMessageAdapter));
 
     return this;
   }
 
   private Behavior<BaristaCommand> onWrappedCoffeeMachineCoffeeReady(
       WrappedCoffeeMachineCoffeeIsReady wrappedCoffeeReady) {
-    CoffeeMachineActor.CoffeeIsReady coffeeReady = wrappedCoffeeReady.coffeeReady;
 
-    getContext().getLog().info("Barista: Picking up {}", coffeeReady.coffee);
+    CoffeeMachineCommand.CoffeeReady coffeeReady = wrappedCoffeeReady.coffeeReady;
 
-    coffeeMachine.tell(new CoffeeMachineActor.PickupCoffee());
+    getContext().getLog().info("Barista: Picking up {}", coffeeReady.coffee());
+
+    coffeeMachine.tell(new CoffeeMachineCommand.PickupCoffee());
 
     return this;
   }
 
   public interface BaristaCommand {}
 
-  public static final class OrderCoffee implements BaristaCommand {
-    public final String whom;
-    public final Coffee coffee;
+  public record OrderCoffee(String whom, Coffee coffee) implements BaristaCommand {}
 
-    public OrderCoffee(String whom, Coffee coffee) {
-      this.whom = whom;
-      this.coffee = coffee;
-    }
-  }
-
-  public static final class WrappedCoffeeMachineCoffeeIsReady implements BaristaCommand {
-    public final CoffeeMachineActor.CoffeeIsReady coffeeReady;
-
-    public WrappedCoffeeMachineCoffeeIsReady(CoffeeMachineActor.CoffeeIsReady coffeeReady) {
-      this.coffeeReady = coffeeReady;
-    }
-  }
+  public record WrappedCoffeeMachineCoffeeIsReady(CoffeeMachineCommand.CoffeeReady coffeeReady)
+      implements BaristaCommand {}
 }

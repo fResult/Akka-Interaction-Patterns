@@ -8,7 +8,7 @@ import akka.actor.testkit.typed.Effect;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import com.akka.training.barista.BaristaActor;
-import com.akka.training.coffeeMachine.CoffeeMachineActor;
+import com.akka.training.coffeeMachine.CoffeeMachineCommand;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +78,7 @@ public class BaristaActorTests {
 
     BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
         BehaviorTestKit.create(BaristaActor.create());
-    TestInbox<CoffeeMachineActor.CoffeeMachineCommand> coffeeMachineInbox =
-        testKit.childInbox("coffee-machine");
+    TestInbox<CoffeeMachineCommand> coffeeMachineInbox = testKit.childInbox("coffee-machine");
 
     testKit.run(new BaristaActor.OrderCoffee(whom, coffee));
 
@@ -87,12 +86,12 @@ public class BaristaActorTests {
 
     assertEquals(1, messages.size());
 
-    CoffeeMachineActor.BrewCoffee brewCoffee = (CoffeeMachineActor.BrewCoffee) messages.get(0);
+    final var brewCoffee = (CoffeeMachineCommand.BrewCoffee) messages.get(0);
 
-    assertEquals(brewCoffee.coffee, coffee);
+    assertEquals(brewCoffee.coffee(), coffee);
     // message adapters have deterministic anonymous names, in the same way as a regular child
     // for reference see:
     // https://doc.akka.io/docs/akka/current/typed/testing-sync.html#sending-messages
-    assertEquals(brewCoffee.replyTo, testKit.childInbox("$a-adapter").getRef());
+    assertEquals(brewCoffee.replyTo(), testKit.childInbox("$a-adapter").getRef());
   }
 }
