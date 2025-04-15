@@ -4,6 +4,7 @@ import akka.actor.testkit.typed.javadsl.LoggingTestKit;
 import akka.actor.testkit.typed.javadsl.TestKitJunitResource;
 import akka.actor.typed.ActorRef;
 import com.akka.training.barista.BaristaActor;
+import com.akka.training.barista.BaristaCommand;
 import com.typesafe.config.ConfigFactory;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -22,14 +23,13 @@ public class EndToEndTests {
   // Pickup coffee action)
   @Test
   public void brewCoffee() {
-    ActorRef<BaristaActor.BaristaCommand> barista =
-        testKit.spawn(BaristaActor.create(), "barista1");
+    ActorRef<BaristaCommand> barista = testKit.spawn(BaristaActor.create(), "barista1");
     var coffee = new Coffee.Akkaccino();
     LoggingTestKit.info("Barista: Picking up " + coffee)
         .expect(
             testKit.system(),
             () -> {
-              barista.tell(new BaristaActor.OrderCoffee("Lisa", coffee));
+              barista.tell(new BaristaCommand.OrderCoffee("Lisa", coffee));
               return null;
             });
   }

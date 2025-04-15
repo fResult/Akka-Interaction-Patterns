@@ -8,6 +8,7 @@ import akka.actor.testkit.typed.Effect;
 import akka.actor.testkit.typed.javadsl.BehaviorTestKit;
 import akka.actor.testkit.typed.javadsl.TestInbox;
 import com.akka.training.barista.BaristaActor;
+import com.akka.training.barista.BaristaCommand;
 import com.akka.training.coffeeMachine.CoffeeMachineCommand;
 import java.util.HashMap;
 import java.util.List;
@@ -25,12 +26,11 @@ public class BaristaActorTests {
     var whom2 = "Lisa";
     var coffee2 = new Coffee.MochaPlay();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
-        BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
     testKit.clearLog();
-    testKit.run(new BaristaActor.OrderCoffee(whom1, coffee1));
-    testKit.run(new BaristaActor.OrderCoffee(whom2, coffee2));
+    testKit.run(new BaristaCommand.OrderCoffee(whom1, coffee1));
+    testKit.run(new BaristaCommand.OrderCoffee(whom2, coffee2));
     List<CapturedLogEvent> allLogEntries = testKit.getAllLogEntries();
 
     Map<String, Coffee> expectedOrders = new HashMap<>();
@@ -47,8 +47,7 @@ public class BaristaActorTests {
   // Barista should spawn a child actor CoffeeMachine with as actor name 'coffee-machine'
   @Test
   public void spawnCoffeeMachineChild() {
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
-        BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
     var effects = testKit.getAllEffects();
 
@@ -63,8 +62,7 @@ public class BaristaActorTests {
 
   @Test
   public void baristaShouldCreateMessageAdapter() {
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
-        BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
 
     var effects = testKit.getAllEffects();
 
@@ -76,11 +74,10 @@ public class BaristaActorTests {
     var whom = "Ben";
     var coffee = new Coffee.Akkaccino();
 
-    BehaviorTestKit<BaristaActor.BaristaCommand> testKit =
-        BehaviorTestKit.create(BaristaActor.create());
+    BehaviorTestKit<BaristaCommand> testKit = BehaviorTestKit.create(BaristaActor.create());
     TestInbox<CoffeeMachineCommand> coffeeMachineInbox = testKit.childInbox("coffee-machine");
 
-    testKit.run(new BaristaActor.OrderCoffee(whom, coffee));
+    testKit.run(new BaristaCommand.OrderCoffee(whom, coffee));
 
     var messages = coffeeMachineInbox.getAllReceived();
 

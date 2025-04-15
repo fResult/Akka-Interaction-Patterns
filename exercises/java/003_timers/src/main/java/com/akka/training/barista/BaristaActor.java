@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> {
+public class BaristaActor extends AbstractBehavior<BaristaCommand> {
   // Orders <Whom, Coffee>
   private final Map<String, Coffee> orders = new HashMap<>();
   // reference to the coffee-machine child actor, allowing to send messages to coffee machine
@@ -30,7 +30,8 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
     coffeeMachineMessageAdapter =
         context.messageAdapter(
-            CoffeeMachineCommand.CoffeeReady.class, WrappedCoffeeMachineCoffeeIsReady::new);
+            CoffeeMachineCommand.CoffeeReady.class,
+            BaristaCommand.WrappedCoffeeMachineCoffeeReady::new);
   }
 
   public static Behavior<BaristaCommand> create() {
@@ -49,26 +50,28 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
   @Override
   public Receive<BaristaCommand> createReceive() {
     return newReceiveBuilder()
-        .onMessage(OrderCoffee.class, this::onOrderCoffee)
-        .onMessage(WrappedCoffeeMachineCoffeeIsReady.class, this::onWrappedCoffeeMachineCoffeeReady)
+        .onMessage(BaristaCommand.OrderCoffee.class, this::onOrderCoffee)
+        .onMessage(
+            BaristaCommand.WrappedCoffeeMachineCoffeeReady.class,
+            this::onWrappedCoffeeMachineCoffeeReady)
         .build();
   }
 
-  private Behavior<BaristaCommand> onOrderCoffee(OrderCoffee command) {
-    orders.put(command.whom, command.coffee);
+  private Behavior<BaristaCommand> onOrderCoffee(BaristaCommand.OrderCoffee command) {
+    orders.put(command.whom(), command.coffee());
 
     getContext().getLog().info("Orders:{}", printOrders(orders.entrySet()));
 
     coffeeMachine.tell(
-        new CoffeeMachineCommand.BrewCoffee(command.coffee, coffeeMachineMessageAdapter));
+        new CoffeeMachineCommand.BrewCoffee(command.coffee(), coffeeMachineMessageAdapter));
 
     return this;
   }
 
   private Behavior<BaristaCommand> onWrappedCoffeeMachineCoffeeReady(
-      WrappedCoffeeMachineCoffeeIsReady wrappedCoffeeReady) {
+      BaristaCommand.WrappedCoffeeMachineCoffeeReady wrappedCoffeeReady) {
 
-    CoffeeMachineCommand.CoffeeReady coffeeReady = wrappedCoffeeReady.coffeeReady;
+    CoffeeMachineCommand.CoffeeReady coffeeReady = wrappedCoffeeReady.coffeeReady();
 
     getContext().getLog().info("Barista: Picking up {}", coffeeReady.coffee());
 
@@ -76,11 +79,4 @@ public class BaristaActor extends AbstractBehavior<BaristaActor.BaristaCommand> 
 
     return this;
   }
-
-  public interface BaristaCommand {}
-
-  public record OrderCoffee(String whom, Coffee coffee) implements BaristaCommand {}
-
-  public record WrappedCoffeeMachineCoffeeIsReady(CoffeeMachineCommand.CoffeeReady coffeeReady)
-      implements BaristaCommand {}
 }
