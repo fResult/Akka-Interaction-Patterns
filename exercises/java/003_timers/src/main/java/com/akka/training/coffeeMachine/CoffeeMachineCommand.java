@@ -6,6 +6,7 @@ import com.akka.training.Coffee;
 public sealed interface CoffeeMachineCommand
     permits CoffeeMachineCommand.BrewCoffee,
         CoffeeMachineCommand.CoffeeReady,
+        CoffeeMachineCommand.CoffeeReadyTick,
         CoffeeMachineCommand.PickupCoffee {
 
   record BrewCoffee(Coffee coffee, ActorRef<CoffeeReady> replyTo) implements CoffeeMachineCommand {}
@@ -15,5 +16,7 @@ public sealed interface CoffeeMachineCommand
   /*
    * Represents the Barista picking up the coffee and resetting the coffee machine, so that it's ready for the next coffee
    */
-  static final class PickupCoffee implements CoffeeMachineCommand {}
+  record PickupCoffee() implements CoffeeMachineCommand {}
+
+  record CoffeeReadyTick() implements CoffeeMachineCommand {}
 }

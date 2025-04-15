@@ -3,6 +3,7 @@ package com.akka.training.coffeeMachine;
 import akka.actor.typed.Behavior;
 import akka.actor.typed.javadsl.ActorContext;
 import akka.actor.typed.javadsl.Behaviors;
+import java.time.Duration;
 
 public class CoffeeMachineActor {
   private static final int BREWING_DURATION_SECONDS = 10;
@@ -17,28 +18,52 @@ public class CoffeeMachineActor {
     context.getLog().info("CoffeeMachine: IDLE");
 
     return Behaviors.receiveMessage(
-        command ->
-            switch (command) {
-              case CoffeeMachineCommand.BrewCoffee brewCoffeeCommand ->
-                  brewing(context, brewCoffeeCommand);
+        coffeeMachineCommand ->
+            switch (coffeeMachineCommand) {
+              case CoffeeMachineCommand.BrewCoffee command -> onBrewCoffee(context, command);
               /*
                * Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore the message)
                */
               case CoffeeMachineCommand.PickupCoffee ignored -> Behaviors.same();
               case CoffeeMachineCommand.CoffeeReady ignored -> Behaviors.same();
+              default -> throw new IllegalStateException("Unexpected value: " + coffeeMachineCommand);
             });
   }
 
-  private static Behavior<CoffeeMachineCommand> brewing(
+  private static Behavior<CoffeeMachineCommand> onBrewCoffee(
       final ActorContext<CoffeeMachineCommand> context, CoffeeMachineCommand.BrewCoffee command) {
 
     context.getLog().info("CoffeeMachine: Brewing 1 {}", command.coffee().toString());
 
     // TODO Implement the brewing duration (10 seconds) WITHOUT using Thread.sleep
     // (Currently the brewing is immediate, CoffeeIsReady is immediately sent to the Barista)
-    command.replyTo().tell(new CoffeeMachineCommand.CoffeeReady(command.coffee()));
+    //    command.replyTo().tell(new CoffeeMachineCommand.CoffeeReady(command.coffee()));
 
-    return coffeeReady(context);
+    //    return coffeeReady(context);
+    return Behaviors.withTimers(
+        timers -> {
+          timers.startSingleTimer(
+              new CoffeeMachineCommand.CoffeeReadyTick(), Duration.ofSeconds(10));
+
+          return brewing(context, command);
+        });
+  }
+
+  private static Behavior<CoffeeMachineCommand> brewing(
+      final ActorContext<CoffeeMachineCommand> context,
+      CoffeeMachineCommand.BrewCoffee brewCoffeeCommand) {
+
+    return Behaviors.receive(CoffeeMachineCommand.class)
+        .onMessage(
+            CoffeeMachineCommand.CoffeeReadyTick.class,
+            ignored -> {
+              brewCoffeeCommand
+                  .replyTo()
+                  .tell(new CoffeeMachineCommand.CoffeeReady(brewCoffeeCommand.coffee()));
+
+              return coffeeReady(context);
+            })
+        .build();
   }
 
   private static Behavior<CoffeeMachineCommand> coffeeReady(
