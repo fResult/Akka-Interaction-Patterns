@@ -15,12 +15,18 @@ public class CoffeeMachineActor {
       final ActorContext<CoffeeMachineCommand> context) {
 
     context.getLog().info("CoffeeMachine: IDLE");
-    return Behaviors.receive(CoffeeMachineCommand.class)
-        .onMessage(CoffeeMachineCommand.BrewCoffee.class, command -> brewing(context, command))
-        // Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore
-        // the message)
-        .onMessage(CoffeeMachineCommand.PickupCoffee.class, command -> Behaviors.same())
-        .build();
+
+    return Behaviors.receiveMessage(
+        command ->
+            switch (command) {
+              case CoffeeMachineCommand.BrewCoffee brewCoffeeCommand ->
+                  brewing(context, brewCoffeeCommand);
+              /*
+               * Can't pick up coffee until coffee is ready, stay in same behavior (equivalent to ignore the message)
+               */
+              case CoffeeMachineCommand.PickupCoffee ignored -> Behaviors.same();
+              case CoffeeMachineCommand.CoffeeReady ignored -> Behaviors.same();
+            });
   }
 
   private static Behavior<CoffeeMachineCommand> brewing(
