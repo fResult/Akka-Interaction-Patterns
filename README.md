@@ -35,7 +35,7 @@ sdk install sbt 1.10.11
 ### Libraries
 
 - `ch.qos.logback:logback-classic` from `1.2.11` to `1.5.18`
-- `junit` from `4.13.2` to `4.13.2` (not update yet)
+- `junit` from `4.13.2` to `4.13.2` (not upgrade yet, and as Akka documentation doesn't mention of using JUnit Jupiter (JUnit 5))
 
 ### Plugins
 
@@ -43,7 +43,7 @@ sdk install sbt 1.10.11
 - `org.codehaus.mojo:exec-maven-plugin` from `1.6.0` to `3.5.0`
 - `org.apache.maven.plugins:maven-surefire-plugin` from `2.2.2` to `3.5.3`
 
-## Added Exercises in Scala
+## Further Learning
 
 ### Java Exercises
 
@@ -51,11 +51,14 @@ Using OO-Style
 
 1. [Request Response Pattern - Java](./exercises/java/001_request_response_pattern)
 2. [Adapted Response Pattern - Java](./exercises/java/002_adapted_response_pattern)
+   - Use *record classes* with *sealed interfaces* instead of *final classes*
 3. [Timers - Java](./exercises/java/003_timers)
+   - Use *record classes* with *sealed interfaces* instead of *final classes*
+   - Use *pattern matching* instead of `onMessage` in `Behavior`
 
 ### Scala Exercises
 
-Using Functional-Style
+Using Functional-Style (with immutable state)
 
 1. [Request Response Pattern - Scala](./exercises/scala/001_request-response-pattern)
 2. [Adapted Response Pattern - Scala](./exercises/scala/002_adapted-response-pattern)

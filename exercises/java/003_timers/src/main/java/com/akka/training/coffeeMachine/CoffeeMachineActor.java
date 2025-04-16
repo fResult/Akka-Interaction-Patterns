@@ -38,12 +38,11 @@ public class CoffeeMachineActor {
     // TODO Implement the brewing duration (10 seconds) WITHOUT using Thread.sleep
     // (Currently the brewing is immediate, CoffeeIsReady is immediately sent to the Barista)
     //    command.replyTo().tell(new CoffeeMachineCommand.CoffeeReady(command.coffee()));
-
     //    return coffeeReady(context);
     return Behaviors.withTimers(
         timers -> {
           timers.startSingleTimer(
-              new CoffeeMachineCommand.CoffeeReadyTick(), Duration.ofSeconds(10));
+              new CoffeeMachineCommand.CoffeeReadyTick(), Duration.ofSeconds(BREWING_DURATION_SECONDS));
 
           return brewing(context, command);
         });
