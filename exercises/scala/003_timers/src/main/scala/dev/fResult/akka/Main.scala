@@ -1,9 +1,11 @@
 package dev.fResult.akka
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
-import akka.actor.typed.{ActorSystem, Behavior}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 
-import scala.annotation.tailrec
+import java.io.IOException
+import scala.io.StdIn.readLine
+import scala.util.control.Exception
 
 @main
 def main(): Unit = {
@@ -12,6 +14,12 @@ def main(): Unit = {
   baristaActor ! OrderCoffee("Wick", Akkacino)
   baristaActor ! OrderCoffee("Anderson", CaffeJava)
   baristaActor ! OrderCoffee("Constantine", MochaPlay)
+
+  println(">>> Press ENTER to exit <<<")
+  readLine()
+  Exception.ignoring(classOf[IOException])
+
+  baristaActor.terminate()
 }
 
 
@@ -23,17 +31,29 @@ object BaristaActor {
 
     val initialState = State()
 
-    Behaviors.receiveMessage {
-      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, initialState)
-    }
+    val coffeeMachineActorRef = context.spawn(CoffeeMachineActor(), "coffee-machine")
+
+    handleCommands(context, coffeeMachineActorRef, initialState)
   })
 
-  private def onOrderCoffee(command: OrderCoffee, context: ActorContext[BaristaCommand], state: State): Behavior[BaristaCommand] = {
-    val updatedState = state.copy(orders = state.orders + (command.whom -> command.coffee))
+  private def handleCommands(context: ActorContext[BaristaCommand], coffeeMachineActorRef: ActorRef[CoffeeMachineCommand], state: State): Behavior[BaristaCommand] = {
+    Behaviors.receiveMessage {
+      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
+      case CoffeeReady(_) => Behaviors.same
+    }
+  }
+
+  private def onOrderCoffee(command: OrderCoffee,
+                            context: ActorContext[BaristaCommand],
+                            coffeeMachineActor: ActorRef[CoffeeMachineCommand],
+                            state: State): Behavior[BaristaCommand] = {
+
+    val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
 
     context.log.info(s"Orders: ${printOrder(updatedState.orders.toSet)}")
 
-    //    onOrderCoffee(command, context, updatedState)
+    coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
+
     Behaviors.same
   }
 
@@ -48,7 +68,32 @@ object BaristaActor {
 sealed trait BaristaCommand
 
 case class OrderCoffee(whom: String, coffee: Coffee) extends BaristaCommand
+
+case class CoffeeReady(coffee: Coffee) extends BaristaCommand
 // Barista protocol ->
+
+object CoffeeMachineActor:
+  def apply(): Behavior[CoffeeMachineCommand] = idle()
+
+  private def idle(): Behavior[CoffeeMachineCommand] = Behaviors.setup { context =>
+    context.log.info("CoffeeMachine: IDLE")
+
+    Behaviors.receiveMessage({
+      case cmd@BrewCoffee(_, _) =>
+        Thread.sleep(3000)
+        cmd.replyTo ! CoffeeReady(cmd.coffee)
+
+        Behaviors.same
+    })
+  }
+end CoffeeMachineActor
+
+// <- CoffeeMachine protocol
+sealed trait CoffeeMachineCommand
+
+case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends CoffeeMachineCommand
+// CoffeeMachine protocol ->
+
 
 // <- Coffee types
 sealed trait Coffee
