@@ -6,6 +6,7 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import java.io.IOException
 import scala.io.StdIn.readLine
 import scala.util.control.Exception
+import scala.util.{Failure, Try}
 
 @main
 def main(): Unit = {
@@ -86,7 +87,10 @@ object CoffeeMachineActor:
       case cmd@BrewCoffee(_, _) =>
         context.log.info(s"Coffee Machine: {} is brewing", cmd.coffee)
 
-        Thread.sleep(3000)
+        Try(Thread.sleep(3000)) match
+          case Failure(ex: InterruptedException) => ex.printStackTrace()
+          case _ => println()
+
         cmd.replyTo ! CoffeeReady(cmd.coffee)
 
         Behaviors.same
@@ -100,7 +104,7 @@ sealed trait CoffeeMachineCommand
 
 case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends CoffeeMachineCommand
 
-case object PickupCoffee extends  CoffeeMachineCommand
+case object PickupCoffee extends CoffeeMachineCommand
 // CoffeeMachine protocol ->
 
 
