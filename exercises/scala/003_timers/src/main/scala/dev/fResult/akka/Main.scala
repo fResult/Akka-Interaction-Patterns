@@ -39,7 +39,11 @@ object BaristaActor {
   private def handleCommands(context: ActorContext[BaristaCommand], coffeeMachineActorRef: ActorRef[CoffeeMachineCommand], state: State): Behavior[BaristaCommand] = {
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-      case CoffeeReady(_) => Behaviors.same
+      case CoffeeReady(_) => {
+        coffeeMachineActorRef ! PickupCoffee
+
+        handleCommands(context, coffeeMachineActorRef, state)
+      }
     }
   }
 
@@ -80,10 +84,13 @@ object CoffeeMachineActor:
 
     Behaviors.receiveMessage({
       case cmd@BrewCoffee(_, _) =>
+        context.log.info(s"Coffee Machine: {} is brewing", cmd.coffee)
+
         Thread.sleep(3000)
         cmd.replyTo ! CoffeeReady(cmd.coffee)
 
         Behaviors.same
+      case PickupCoffee => Behaviors.same
     })
   }
 end CoffeeMachineActor
@@ -92,6 +99,8 @@ end CoffeeMachineActor
 sealed trait CoffeeMachineCommand
 
 case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends CoffeeMachineCommand
+
+case object PickupCoffee extends  CoffeeMachineCommand
 // CoffeeMachine protocol ->
 
 
