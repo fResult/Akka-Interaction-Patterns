@@ -59,7 +59,10 @@ object BaristaActor {
 
     coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
 
-    Behaviors.same
+    Behaviors.receiveMessage {
+      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActor, updatedState)
+      case _ => Behaviors.same
+    }
   }
 
   private def printOrder(orderSet: Set[(String, Coffee)]): String = {
