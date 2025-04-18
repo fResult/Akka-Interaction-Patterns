@@ -61,7 +61,7 @@ object BaristaActor {
 
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActor, updatedState)
-      case CoffeeReady(coffee) =>
+      case CoffeeReady(coffee) => // TODO: Extract to `onCoffeeReady` and remove the order that already finish brewing
         context.log.info(s"Barista: Coffee $coffee is ready...")
         coffeeMachineActor ! PickupCoffee(coffee)
         Behaviors.same
