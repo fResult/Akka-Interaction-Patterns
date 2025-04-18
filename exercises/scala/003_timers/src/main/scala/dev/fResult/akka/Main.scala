@@ -90,13 +90,12 @@ object CoffeeMachineActor:
   private def idle(): Behavior[CoffeeMachineCommand] = Behaviors.setup { context =>
     context.log.info("CoffeeMachine: IDLE")
 
-    Behaviors.receiveMessage({
+    Behaviors.receiveMessage {
       case cmd@BrewCoffee(_, _) => onBrewCoffee(cmd, context)
-      case PickupCoffee(coffee) => {
+      case PickupCoffee(coffee) =>
         context.log.info(s"CoffeeMachine: Picking up coffee: $coffee")
         Behaviors.same
-      }
-    })
+    }
   }
 
   private def onBrewCoffee(command: BrewCoffee,
