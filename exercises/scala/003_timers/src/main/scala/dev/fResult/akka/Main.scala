@@ -61,11 +61,10 @@ object BaristaActor {
 
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActor, updatedState)
-      case CoffeeReady(coffee) => {
+      case CoffeeReady(coffee) =>
         context.log.info(s"Barista: Coffee $coffee is ready...")
         coffeeMachineActor ! PickupCoffee(coffee)
         Behaviors.same
-      }
     }
   }
 
@@ -102,7 +101,7 @@ object CoffeeMachineActor:
                            context: ActorContext[CoffeeMachineCommand],
                           ): Behavior[CoffeeMachineCommand] = {
 
-    context.log.info(s"Coffee Machine: {} is brewing", command.coffee)
+    context.log.info(s"CoffeeMachine: {} is brewing", command.coffee)
 
     Try(Thread.sleep(3000)) match
       case Failure(ex: InterruptedException) => ex.printStackTrace()
