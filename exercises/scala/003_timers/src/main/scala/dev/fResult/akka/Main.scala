@@ -84,18 +84,23 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: IDLE")
 
     Behaviors.receiveMessage({
-      case cmd@BrewCoffee(_, _) =>
-        context.log.info(s"Coffee Machine: {} is brewing", cmd.coffee)
-
-        Try(Thread.sleep(3000)) match
-          case Failure(ex: InterruptedException) => ex.printStackTrace()
-          case _ => println()
-
-        cmd.replyTo ! CoffeeReady(cmd.coffee)
-
-        Behaviors.same
+      case cmd@BrewCoffee(_, _) => onBrewCoffee(context, cmd)
       case PickupCoffee => Behaviors.same
     })
+  }
+
+  private def onBrewCoffee(context: ActorContext[CoffeeMachineCommand],
+                           cmd: BrewCoffee): Behavior[CoffeeMachineCommand] = {
+
+    context.log.info(s"Coffee Machine: {} is brewing", cmd.coffee)
+
+    Try(Thread.sleep(3000)) match
+      case Failure(ex: InterruptedException) => ex.printStackTrace()
+      case _ =>
+
+    cmd.replyTo ! CoffeeReady(cmd.coffee)
+
+    Behaviors.same
   }
 end CoffeeMachineActor
 
