@@ -61,12 +61,20 @@ object BaristaActor {
 
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActor, updatedState)
-      case CoffeeReady(coffee) => // TODO: Extract to `onCoffeeReady` and remove the order that already finish brewing
-        context.log.info(s"Barista: Coffee $coffee is ready...")
-        coffeeMachineActor ! PickupCoffee(coffee)
-        Behaviors.same
+      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActor)
     }
   }
+
+  private def onCoffeeReady(coffee: Coffee,
+                            context: ActorContext[BaristaCommand],
+                            coffeeMachineActor: ActorRef[CoffeeMachineCommand],
+                           ): Behavior[BaristaCommand] = {
+
+    context.log.info(s"Barista: Coffee $coffee is ready...")
+    coffeeMachineActor ! PickupCoffee(coffee)
+    Behaviors.same
+  }
+
 
   private def printOrder(orderSet: Set[(String, Coffee)]): String = {
     val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
