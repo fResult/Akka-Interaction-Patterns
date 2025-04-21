@@ -94,7 +94,7 @@ object CoffeeMachineActor:
 
     Behaviors.receiveMessage {
       case cmd@BrewCoffee(_, _) => onBrewCoffee(cmd, context)
-      case PickupCoffee(coffee) => onPickupCoffee(coffee, context)
+      case PickupCoffee(coffee) => Behaviors.same
     }
   }
 
