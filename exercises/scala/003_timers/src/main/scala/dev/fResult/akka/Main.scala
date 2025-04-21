@@ -40,7 +40,7 @@ object BaristaActor {
   private def handleCommands(context: ActorContext[BaristaCommand], coffeeMachineActorRef: ActorRef[CoffeeMachineCommand], state: State): Behavior[BaristaCommand] = {
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActorRef)
+      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActorRef, state)
     }
   }
 
@@ -60,12 +60,14 @@ object BaristaActor {
 
   private def onCoffeeReady(coffee: Coffee,
                             context: ActorContext[BaristaCommand],
-                            coffeeMachineActor: ActorRef[CoffeeMachineCommand],
+                            coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
+                            state: State,
                            ): Behavior[BaristaCommand] = {
 
     context.log.info(s"Barista: Coffee $coffee is ready...")
-    coffeeMachineActor ! PickupCoffee(coffee)
-    Behaviors.same
+    coffeeMachineActorRef ! PickupCoffee(coffee)
+
+    handleCommands(context, coffeeMachineActorRef, state)
   }
 
 
@@ -92,9 +94,7 @@ object CoffeeMachineActor:
 
     Behaviors.receiveMessage {
       case cmd@BrewCoffee(_, _) => onBrewCoffee(cmd, context)
-      case PickupCoffee(coffee) =>
-        context.log.info(s"CoffeeMachine: Picking up coffee: $coffee")
-        Behaviors.same
+      case PickupCoffee(coffee) => onPickupCoffee(coffee, context)
     }
   }
 
@@ -111,6 +111,14 @@ object CoffeeMachineActor:
     command.replyTo ! CoffeeReady(command.coffee)
 
     // coffeeReady
+    Behaviors.same
+  }
+
+  private def onPickupCoffee(coffee: Coffee,
+                             context: ActorContext[CoffeeMachineCommand],
+                            ): Behavior[CoffeeMachineCommand] = {
+
+    context.log.info(s"CoffeeMachine: Picking up coffee: $coffee")
     Behaviors.same
   }
 end CoffeeMachineActor
