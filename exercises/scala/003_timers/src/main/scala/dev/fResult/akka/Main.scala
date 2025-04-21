@@ -46,19 +46,16 @@ object BaristaActor {
 
   private def onOrderCoffee(command: OrderCoffee,
                             context: ActorContext[BaristaCommand],
-                            coffeeMachineActor: ActorRef[CoffeeMachineCommand],
+                            coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
                             state: State): Behavior[BaristaCommand] = {
 
     val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
 
     context.log.info(s"Orders: ${printOrder(updatedState.orders.toSet)}")
 
-    coffeeMachineActor ! BrewCoffee(command.coffee, context.self)
+    coffeeMachineActorRef ! BrewCoffee(command.coffee, context.self)
 
-    Behaviors.receiveMessage {
-      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActor, updatedState)
-      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActor)
-    }
+    handleCommands(context, coffeeMachineActorRef, updatedState)
   }
 
   private def onCoffeeReady(coffee: Coffee,
