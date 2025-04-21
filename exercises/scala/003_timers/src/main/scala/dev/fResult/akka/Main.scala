@@ -4,9 +4,10 @@ import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 
 import java.io.IOException
+import java.util.concurrent.TimeUnit
+import scala.concurrent.duration.FiniteDuration
 import scala.io.StdIn.readLine
 import scala.util.control.Exception
-import scala.util.{Failure, Try}
 
 @main
 def main(): Unit = {
@@ -93,24 +94,36 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: IDLE")
 
     Behaviors.receiveMessage {
-      case cmd@BrewCoffee(_, _) => onBrewCoffee(cmd, context)
-      case PickupCoffee(coffee) => Behaviors.same
+      case cmd@BrewCoffee(_, _) => startBrewing(cmd, context)
+      case _ => Behaviors.same
     }
   }
 
-  private def onBrewCoffee(command: BrewCoffee,
+  private def startBrewing(command: BrewCoffee,
                            context: ActorContext[CoffeeMachineCommand],
                           ): Behavior[CoffeeMachineCommand] = {
 
+    Behaviors.withTimers(timers => {
+      timers.startSingleTimer(CoffeeReadyTick, FiniteDuration(3, TimeUnit.SECONDS))
+
+      brewCoffee(command, context)
+    })
+  }
+
+  private def brewCoffee(command: BrewCoffee,
+                         context: ActorContext[CoffeeMachineCommand],
+                        ): Behavior[CoffeeMachineCommand] = {
+
     context.log.info(s"CoffeeMachine: {} is brewing", command.coffee)
 
-    Try(Thread.sleep(3000)) match
-      case Failure(ex: InterruptedException) => ex.printStackTrace()
-      case _ =>
+    Behaviors.receiveMessage {
+      case CoffeeReadyTick => {
+        command.replyTo ! CoffeeReady(command.coffee)
 
-    command.replyTo ! CoffeeReady(command.coffee)
-
-    coffeeReady(command.coffee, context)
+        coffeeReady(command.coffee, context)
+      }
+      case _ => Behaviors.same
+    }
   }
 
   private def onPickupCoffee(coffee: Coffee,
@@ -118,7 +131,7 @@ object CoffeeMachineActor:
                             ): Behavior[CoffeeMachineCommand] = {
 
     context.log.info(s"CoffeeMachine: Picking up coffee: $coffee")
-    Behaviors.same
+    idle()
   }
 
   private def coffeeReady(coffee: Coffee,
@@ -128,8 +141,9 @@ object CoffeeMachineActor:
     context.log.info("CoffeeMachine: Coffee {} is ready", coffee)
 
     Behaviors.receiveMessage {
-      case cmd@BrewCoffee(_, _) => onBrewCoffee(cmd, context)
+      case cmd@BrewCoffee(_, _) => Behaviors.same
       case PickupCoffee(coffee) => onPickupCoffee(coffee, context)
+      case _ => Behaviors.same
     }
   }
 end CoffeeMachineActor
@@ -140,6 +154,8 @@ sealed trait CoffeeMachineCommand
 case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends CoffeeMachineCommand
 
 case class PickupCoffee(coffee: Coffee) extends CoffeeMachineCommand
+
+case object CoffeeReadyTick extends CoffeeMachineCommand
 // CoffeeMachine protocol ->
 
 
