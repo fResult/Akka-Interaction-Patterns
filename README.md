@@ -12,7 +12,7 @@ course OFFERED BY [AKKADEMY](https://akkademy.akka.io)
 - Scala 3.6.x or newer \[for [Scala exercise](#scala-exercises)\]
 - SBT 1.10.x or newer \[for [Scala exercise](#scala-exercises)\] (to be safe, the version should be `1.10.11 <= version < 2.0.0`)
 
-\[Optional\] You can use [SDKMAN!](https://sdkman.io/install) to install JDK23, and Maven:
+\[Optional\] You can use [SDKMAN!](https://sdkman.io/install) to install JDK23, Maven, Scala, and SBT:
 
 Installation Example:
 
