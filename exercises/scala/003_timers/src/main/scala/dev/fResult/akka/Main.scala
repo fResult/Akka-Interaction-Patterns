@@ -40,11 +40,7 @@ object BaristaActor {
   private def handleCommands(context: ActorContext[BaristaCommand], coffeeMachineActorRef: ActorRef[CoffeeMachineCommand], state: State): Behavior[BaristaCommand] = {
     Behaviors.receiveMessage {
       case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-      case CoffeeReady(coffee) => {
-        coffeeMachineActorRef ! PickupCoffee(coffee)
-
-        handleCommands(context, coffeeMachineActorRef, state)
-      }
+      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActorRef)
     }
   }
 
