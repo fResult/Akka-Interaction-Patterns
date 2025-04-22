@@ -5,6 +5,8 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import dev.fResult.akka.Coffee.{Akkacino, CaffeJava, MochaPlay}
 import dev.fResult.akka.barista.BaristaCommand
 import dev.fResult.akka.barista.BaristaCommand.{CoffeeReady, OrderCoffee, WrappedCoffeeMachineCoffeeReady}
+import dev.fResult.akka.coffeeCommand.CoffeeMachineCommand
+import dev.fResult.akka.coffeeCommand.CoffeeMachineCommand.{BrewCoffee, CoffeeReadyTick, PickupCoffee}
 
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -154,12 +156,3 @@ object CoffeeMachineActor:
     }
   }
 end CoffeeMachineActor
-
-// <- CoffeeMachine protocol
-sealed trait CoffeeMachineCommand
-
-case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends CoffeeMachineCommand
-
-case class PickupCoffee(coffee: Coffee) extends CoffeeMachineCommand
-
-case object CoffeeReadyTick extends CoffeeMachineCommand
