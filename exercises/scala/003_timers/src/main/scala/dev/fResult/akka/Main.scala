@@ -2,6 +2,9 @@ package dev.fResult.akka
 
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import dev.fResult.akka.Coffee.{Akkacino, CaffeJava, MochaPlay}
+import dev.fResult.akka.barista.BaristaCommand
+import dev.fResult.akka.barista.BaristaCommand.{CoffeeReady, OrderCoffee, WrappedCoffeeMachineCoffeeReady}
 
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -35,19 +38,17 @@ object BaristaActor {
 
     val coffeeMachineActorRef = context.spawn(CoffeeMachineActor(), "coffee-machine")
 
-    handleCommands(context, coffeeMachineActorRef, initialState)
-  })
+    val coffeeMachineMessageAdapter = context.messageAdapter[CoffeeReady](
+      response => WrappedCoffeeMachineCoffeeReady(response)
+    )
 
-  private def handleCommands(context: ActorContext[BaristaCommand], coffeeMachineActorRef: ActorRef[CoffeeMachineCommand], state: State): Behavior[BaristaCommand] = {
-    Behaviors.receiveMessage {
-      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, state)
-      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActorRef, state)
-    }
-  }
+    handleCommands(context, coffeeMachineActorRef, coffeeMachineMessageAdapter, initialState)
+  })
 
   private def onOrderCoffee(command: OrderCoffee,
                             context: ActorContext[BaristaCommand],
                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
+                            adapter: ActorRef[CoffeeReady],
                             state: State): Behavior[BaristaCommand] = {
 
     val updatedState = state.copy(state.orders + (command.whom -> command.coffee))
@@ -56,21 +57,34 @@ object BaristaActor {
 
     coffeeMachineActorRef ! BrewCoffee(command.coffee, context.self)
 
-    handleCommands(context, coffeeMachineActorRef, updatedState)
+    handleCommands(context, coffeeMachineActorRef, adapter, updatedState)
   }
 
   private def onCoffeeReady(coffee: Coffee,
                             context: ActorContext[BaristaCommand],
                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
+                            adapter: ActorRef[CoffeeReady],
                             state: State,
                            ): Behavior[BaristaCommand] = {
 
     context.log.info(s"Barista: I'm going to pickup $coffee...")
     coffeeMachineActorRef ! PickupCoffee(coffee)
 
-    handleCommands(context, coffeeMachineActorRef, state)
+    handleCommands(context, coffeeMachineActorRef, adapter, state)
   }
 
+  private def handleCommands(context: ActorContext[BaristaCommand],
+                             coffeeMachineActorRef: ActorRef[CoffeeMachineCommand],
+                             adapter: ActorRef[CoffeeReady],
+                             state: State,
+                            ): Behavior[BaristaCommand] = {
+
+    Behaviors.receiveMessage {
+      case cmd@OrderCoffee(_, _) => onOrderCoffee(cmd, context, coffeeMachineActorRef, adapter, state)
+      case CoffeeReady(coffee) => onCoffeeReady(coffee, context, coffeeMachineActorRef, adapter, state)
+      case WrappedCoffeeMachineCoffeeReady(response) => onCoffeeReady(response.coffee, context, coffeeMachineActorRef, adapter, state)
+    }
+  }
 
   private def printOrder(orderSet: Set[(String, Coffee)]): String = {
     val formattedOrders = orderSet.map(order => s"${order._1}->${order._2}")
@@ -78,14 +92,6 @@ object BaristaActor {
     s"[${formattedOrders.mkString(", ")}]"
   }
 }
-
-// <- Barista protocol
-sealed trait BaristaCommand
-
-case class OrderCoffee(whom: String, coffee: Coffee) extends BaristaCommand
-
-case class CoffeeReady(coffee: Coffee) extends BaristaCommand
-// Barista protocol ->
 
 object CoffeeMachineActor:
   def apply(): Behavior[CoffeeMachineCommand] = idle()
@@ -95,7 +101,8 @@ object CoffeeMachineActor:
 
     Behaviors.receiveMessage {
       case cmd@BrewCoffee(_, _) => startBrewing(cmd, context)
-      case _ => Behaviors.same
+      case PickupCoffee(_) => Behaviors.same
+      case cmd@_ => throw new IllegalStateException("Unexpected value: " + cmd)
     }
   }
 
@@ -156,16 +163,3 @@ case class BrewCoffee(coffee: Coffee, replyTo: ActorRef[BaristaCommand]) extends
 case class PickupCoffee(coffee: Coffee) extends CoffeeMachineCommand
 
 case object CoffeeReadyTick extends CoffeeMachineCommand
-// CoffeeMachine protocol ->
-
-
-// <- Coffee types
-sealed trait Coffee
-
-case object Akkacino extends Coffee
-
-case object CaffeJava extends Coffee
-
-case object MochaPlay extends Coffee
-// Coffee types ->
-
