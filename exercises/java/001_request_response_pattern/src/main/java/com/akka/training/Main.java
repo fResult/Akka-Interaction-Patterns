@@ -14,6 +14,7 @@ public class Main {
 
     actorSystem.tell(new BaristaActor.OrderCoffee("Bart", new Coffee.Akkaccino()));
     actorSystem.tell(new BaristaActor.OrderCoffee("Lisa", new Coffee.MochaPlay()));
+    actorSystem.tell(new BaristaActor.OrderCoffee("Korn", new Coffee.CaffeJava()));
 
     try {
       System.out.println(">>> Press ENTER to exit <<<");
